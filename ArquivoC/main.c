@@ -1,44 +1,61 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
-typedef struct dadosBancariosOriginal
-{
-    int id;
-    char nome[50];
-    float saldo;
-    struct dadosBancariosOriginal *prox;
+#include "DadosBancoOriginal.h"
+#include "DadosOrdenadoNome.h"
+#include "DadosOrdenadoSaldo.h"
 
-} dadosBancariosOriginal;
 
-dadosBancariosOriginal *carregarArquivos( dadosBancariosOriginal *lista){
-    FILE *ponteiro_arquivo;
-    ponteiro_arquivo = fopen("DadosBancoPulini.txt", "r");
+int main(){
+	
+	dadosBancarios *lista = iniciarlista(); 
+	lista = carregarArquivos(lista);
+	
+	
+	dadosOrdeNome *listaNome = iniciarlistaNome();
+	listaNome = preencherListaOrdenadaNome(lista, listaNome);
+	double tempoInicialBuble = (double)clock();
+	listaNome = ordenarDadosbubble_sort(listaNome);
+	double tempoFinalBuble = (double)clock();
+	double totaltempoBuble = (double) (tempoInicialBuble - tempoFinalBuble) / CLOCKS_PER_SEC;
+	printf("Inicial buble: %.2lf\nFinal buble: %.2lf\nTotal buble: %.2lf\n\n",tempoInicialBuble, tempoFinalBuble, totaltempoBuble );
+	imprimeListaNome(listaNome);
 
-    if (ponteiro_arquivo == NULL)
-        printf("ERRO! O arquivo não foi aberto!\n");
-    else{
-        printf("O arquivo foi aberto com sucesso!");
-        while(!feof(ponteiro_arquivo)){
-            char conteudo[100];
-            fgets(conteudo, 100, ponteiro_arquivo);
-            printf(" conteudo: %s", conteudo);
-        }
+	dadosOrdeSaldo *listaSaldo = iniciarlistaSaldo();
+	listaSaldo = preencherListaOrdenadaSaldo(lista, listaSaldo);
+	clock_t tempoInicialQuick = clock();
+	ordenarDadosquickSort(listaSaldo, tamListaSaldo(listaSaldo));
+	clock_t tempoFinalQuick = clock();
+	double totaltempoQuick = (double) (tempoInicialQuick - tempoFinalQuick) / CLOCKS_PER_SEC;
+	printf("Inicial quick: %.2lf\nFinal quick: %.2lf\nTotal quick: %.2lf\n",tempoInicialQuick, tempoFinalQuick, totaltempoQuick );
+	
+	gerarAquivoNome(listaNome);
+	gerarAquivoSaldo(listaSaldo);
+	
+	return 0;
 }
-
-int separastring(char *minhaString) {
-
-    for (int i = 0; i < strlen(minhaString); i++)
-    {
-        if (minhaString[i] == '|')
-        {
-            return i;
-        }
-    }
-}
-
-
-int main(int argc, char const *argv[])
-{
-    printf("merda");
-    return 0;
-}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
