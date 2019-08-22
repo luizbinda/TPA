@@ -38,7 +38,7 @@ void imprimeListaNome(dadosOrdeNome *lista){
 	   atual = atual->prox;
 	}
 	printf("\n\n");
-	system("PAUSE");
+	
 }
 
 int tamListaNome(dadosOrdeNome *lista){

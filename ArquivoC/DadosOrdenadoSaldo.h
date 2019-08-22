@@ -92,21 +92,58 @@ dadosOrdeSaldo* ordenarDadosquickSort( dadosOrdeSaldo *first, long int tam ) {
      }
 }
 
+char* transformaSaldo( char* char_saldo){
+	
+	char saldo[10];
+	
+	int i, j, k;
+	j = 0;
+	int cont = strlen(char_saldo) / 3;
+	if (cont > 1 || strlen(char_saldo) == 3 ){
+		k = cont - 1 + strlen(char_saldo) ;
+	}
+	else if (cont == 1){
+		k = cont + strlen(char_saldo) ;
+	}
+
+	printf("saldo: %s\n", char_saldo);
+	for ( i = strlen(char_saldo) ; i >=  0; i--){
+		if ( j > 3){
+			saldo[k] = '.';
+			k--;
+			j = 0;
+		}
+		saldo[k] = char_saldo[i];
+		k--;
+		j++;
+	}
+	saldo[cont + strlen(char_saldo)] = '\0';
+	
+	printf("saldo: %s\n\n", saldo);
+	strcpy(char_saldo, saldo);
+	return char_saldo;
+	
+}
 
 void gerarAquivoSaldo(dadosOrdeSaldo* lista){
 	FILE *arquivo;
 	char nomearq[50] = "ArquivoSaldo.CSV ";
-	if (!(arquivo = fopen(nomearq,"w"))) /* Caso ocorra algum erro na abertura do arquivo..*/
-	{                            /* o programa aborta automaticamente */
-			printf("Erro! Impossivel abrir o arquivo!\n");
-			exit(1);
+
+	if (!(arquivo = fopen(nomearq,"w")))
+	{     
+		printf("Erro! Impossivel abrir o arquivo!\n");
+		exit(1);
 	}
-	/* Se nao houve erro, imprime no arquivo, fecha ...*/
 	dadosOrdeSaldo* aux = lista;
 	while (aux->prox != NULL)
-	{
-		fprintf(arquivo,"%i|%s|%0.f,00\n", aux->cliente->id, aux->cliente->nome, aux->cliente->saldo);
+	{			
+		char char_saldo[50];
+		sprintf(char_saldo, "%.0f", aux->cliente->saldo);
+		strcpy(char_saldo, transformaSaldo(char_saldo));
+
+		fprintf(arquivo,"%i|%s|%s,00\n", aux->cliente->id, aux->cliente->nome, char_saldo);
 		aux = aux->prox;
 	}
 	fclose(arquivo);
 }
+
