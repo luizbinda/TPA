@@ -94,21 +94,21 @@ dadosOrdeSaldo* ordenarDadosquickSort( dadosOrdeSaldo *first, long int tam ) {
 
 char* transformaSaldo( char* char_saldo){
 	
-	char saldo[10];
-	
+	char saldo[50];	
 	int i, j, k;
+	int cont = 0;
 	j = 0;
-	int cont = strlen(char_saldo) / 3;
-	if (cont > 1 || strlen(char_saldo) == 3 ){
-		k = cont - 1 + strlen(char_saldo) ;
+	for ( i = strlen(char_saldo) ; i > 0; i--){
+		if (j > 2){
+			cont++;
+			j = 0;
+		}	
+		j++;	
 	}
-	else if (cont == 1){
-		k = cont + strlen(char_saldo) ;
-	}
-
-	printf("saldo: %s\n", char_saldo);
-	for ( i = strlen(char_saldo) ; i >=  0; i--){
-		if ( j > 3){
+	k =  strlen(char_saldo) + cont - 1;
+	j = 0;
+	for ( i =  strlen(char_saldo) - 1 ; i >= 0; i--){
+		if ( j > 2){
 			saldo[k] = '.';
 			k--;
 			j = 0;
@@ -118,8 +118,6 @@ char* transformaSaldo( char* char_saldo){
 		j++;
 	}
 	saldo[cont + strlen(char_saldo)] = '\0';
-	
-	printf("saldo: %s\n\n", saldo);
 	strcpy(char_saldo, saldo);
 	return char_saldo;
 	
@@ -135,7 +133,7 @@ void gerarAquivoSaldo(dadosOrdeSaldo* lista){
 		exit(1);
 	}
 	dadosOrdeSaldo* aux = lista;
-	while (aux->prox != NULL)
+	while (aux != NULL)
 	{			
 		char char_saldo[50];
 		sprintf(char_saldo, "%.0f", aux->cliente->saldo);

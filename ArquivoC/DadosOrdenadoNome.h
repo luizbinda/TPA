@@ -51,9 +51,18 @@ int tamListaNome(dadosOrdeNome *lista){
 	}
 	return cont;
 }
-
+/* 
+	COMPLEXIBILIDADE DA FUNÇÃO tamListaNome
+	45 => 2Trec + Tarm
+    46=> Trec + Tarm
+    48 => 2Trec + T>
+    49 => 2Trec + Tarm
+    50 => 2Trec + tarm
+    52 => Trec + Tret
+    RESULTADO => 10Trec + 4Tarm + 1Tret
+*/
 dadosOrdeNome* ptrElement ( dadosOrdeNome* first, long int pos ){
-       
+         
        if( pos > tamListaNome( first ) - 1 ) {
            return NULL;
        }
@@ -68,6 +77,19 @@ dadosOrdeNome* ptrElement ( dadosOrdeNome* first, long int pos ){
        
        return aux;
 }
+/*
+    COMPLEXIBILIDADE DA FUNÇÃO ptrElement
+	66 => 3Trec + T- + Tret + Tchamada(10Trec + 4Tarm + 1Tret)
+    67 => Tret + Trec
+    70 => Tarm + Trec
+    71 => Tarm + Trec
+    73 => 2Trec + T<
+    74 => 2Trec + Tarm
+    75 2Trec + Tarm
+    78 => Trec + Tret
+    RESULTADO => 13Trec + 4Tarm + 3Tret + T- + T< + Tchamada(10Trec + 4Tarm + 1Tret)
+
+ */
 
 dadosOrdeNome *ordenarDadosbubble_sort(dadosOrdeNome* first){ 
 
@@ -86,20 +108,71 @@ dadosOrdeNome *ordenarDadosbubble_sort(dadosOrdeNome* first){
     return first;
   
 }
+/*
+    COMPLEXIBILIDADE DA FUNÇÃO ordenarDadosbubble_sort
+    96 => 2Tarm
+    98.1 => 3Trec + T- + 2Tarm+ Tchamada(10Trec + 4Tarm + 1Tret)
+    98.2 => (2Trec + T>) * (n+1)
+    98.3 => (2Trec + Tarm)n
+    99.1 => 2Trec +Tarm
+    99.2 => (2Trec + T<) * n
+    99.3 => (2Trec +Tarm) * (n-1)
+    100 => 8Trec + T> + 3Tret + 3Tarm + 2Tchamada(13Trec + 4Tarm + 3Tret + T- + T< + Tchamada(10Trec + 4Tarm + 1Tret)) + Tchamada(strcmp?)
+    101 => 5Trec + 2Tarm  + T- + Tret + Tchamada(13Trec + 4Tarm + 3Tret + T- + T< + Tchamada(10Trec + 4Tarm + 1Tret))
+    102 => 7Trec + 3Tarm + 2Tret + 2Tchamada(13Trec + 4Tarm + 3Tret + T- + T< + Tchamada(10Trec + 4Tarm + 1Tret))
+    103 => 4Trec + 2Tarm + 1Tret + Tchamada(13Trec + 4Tarm + 3Tret + T- + T< + Tchamada(10Trec + 4Tarm + 1Tret))
+    108 Trec + Tret  
+    RESULTADO => 14Tarm + 29Trec + 2T- + 8Tret + Tchamada(10Trec + 4Tarm + 1Tret) + 2T> + (2Trec + T>) * n + (2Trec + Tarm)n + (2Trec + T<) * n + (2Trec +Tarm) * n 
+ */
+
+char* transformaSaldoNome( char* char_saldo){
+	
+	char saldo[50];	
+	int i, j, k;
+	int cont = 0;
+	j = 0;
+	for ( i = strlen(char_saldo) ; i > 0; i--){
+		if (j > 2){
+			cont++;
+			j = 0;
+		}	
+		j++;	
+	}
+	k =  strlen(char_saldo) + cont - 1;
+	j = 0;
+	for ( i =  strlen(char_saldo) - 1 ; i >= 0; i--){
+		if ( j > 2){
+			saldo[k] = '.';
+			k--;
+			j = 0;
+		}
+		saldo[k] = char_saldo[i];
+		k--;
+		j++;
+	}
+	saldo[cont + strlen(char_saldo)] = '\0';
+	strcpy(char_saldo, saldo);
+	return char_saldo;
+	
+}
 
 void gerarAquivoNome(dadosOrdeNome* lista){
 	FILE *arquivo;
 	char nomearq[50] = "ArquivoNome.CSV ";
-	if (!(arquivo = fopen(nomearq,"w"))) /* Caso ocorra algum erro na abertura do arquivo..*/
-	{                            /* o programa aborta automaticamente */
-			printf("Erro! Impossivel abrir o arquivo!\n");
-			exit(1);
+
+	if (!(arquivo = fopen(nomearq,"w")))
+	{     
+		printf("Erro! Impossivel abrir o arquivo!\n");
+		exit(1);
 	}
-	/* Se nao houve erro, imprime no arquivo, fecha ...*/
 	dadosOrdeNome* aux = lista;
-	while (aux->prox != NULL)
-	{
-		fprintf(arquivo,"%i|%s|%0.f,00\n", aux->cliente->id, aux->cliente->nome, aux->cliente->saldo);
+	while (aux != NULL)
+	{			
+		char char_saldo[50];
+		sprintf(char_saldo, "%.0f", aux->cliente->saldo);
+		strcpy(char_saldo, transformaSaldoNome(char_saldo));
+
+		fprintf(arquivo,"%i|%s|%s,00\n", aux->cliente->id, aux->cliente->nome, char_saldo);
 		aux = aux->prox;
 	}
 	fclose(arquivo);
