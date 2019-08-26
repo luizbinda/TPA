@@ -43,15 +43,24 @@ void imprimeListaSaldo(dadosOrdeSaldo *lista){
 
 int tamListaSaldo(dadosOrdeSaldo *lista){
 	dadosOrdeSaldo *atual = lista;
-	int cont =0;
+	int cont = 0;
 
 	while(atual != NULL){
 		cont++;
-	   atual = atual->prox;
+		atual = atual->prox;
 	}
 	return cont;
 }
-
+/* 
+	COMPLEXIBILIDADE DA FUNÇÃO tamListaNome
+	45 => 2Trec + Tarm
+    46=> Trec + Tarm
+    48 => (2Trec + T>)*n
+    49 => 2Trec + Tarm
+    50 => 2Trec + tarm
+    52 => Trec + Tret
+    RESULTADO => 8Trec + 4Tarm + 1Tret + (2Trec + T>)*n
+*/
 dadosOrdeSaldo* ptrElementSaldo ( dadosOrdeSaldo* first, long int pos ){
     
        long int count = 0;
@@ -63,7 +72,16 @@ dadosOrdeSaldo* ptrElementSaldo ( dadosOrdeSaldo* first, long int pos ){
        
        return first;
 }
+/*
+    COMPLEXIBILIDADE DA FUNÇÃO ptrElement
+	66 => Tret + Trec
+    68 => (2Trec + T<)*n
+    69 => Tarm + Trec
+    70 => 2Trec + Tarm + T+
+    73 => Trec + Tret
+    RESULTADO => 5Trec + 2Tarm + 1Tret + T< + T+ + (2Trec + T<)*n
 
+ */
 dadosOrdeSaldo* ordenarDadosquickSort( dadosOrdeSaldo *first, long int tam ) {
      
      long int posesq = 0;
@@ -91,6 +109,13 @@ dadosOrdeSaldo* ordenarDadosquickSort( dadosOrdeSaldo *first, long int tam ) {
          ordenarDadosquickSort( ptrElementSaldo( first, posesq ), tam - posesq );
      }
 }
+/*
+    COMPLEXIBILIDADE DA FUNÇÃO ptrElement
+	
+    RESULTADO => 5Trec + 2Tarm + 1Tret + T< + T+ + (2Trec + T<)*n
+
+ */
+
 
 char* transformaSaldo( char* char_saldo){
 	

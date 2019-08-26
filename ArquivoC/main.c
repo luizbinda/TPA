@@ -29,6 +29,7 @@ int main(){
 			listaNome = iniciarlistaNome();
 			listaNome = preencherListaOrdenadaNome(lista, listaNome);
 			double tempoInicialBuble = (double)clock();
+			printf("Inicial buble: %.2lf\n\n",tempoInicialBuble);
 			listaNome = ordenarDadosbubble_sort(listaNome);
 			double tempoFinalBuble = (double)clock();
 			double totaltempoBuble = (double) (tempoInicialBuble - tempoFinalBuble) / CLOCKS_PER_SEC;

@@ -59,7 +59,7 @@ int tamListaNome(dadosOrdeNome *lista){
     49 => 2Trec + Tarm
     50 => 2Trec + tarm
     52 => Trec + Tret
-    RESULTADO => 10Trec + 4Tarm + 1Tret
+    RESULTADO => 8Trec + 4Tarm + 1Tret + (2Trec + T>)*n
 */
 dadosOrdeNome* ptrElement ( dadosOrdeNome* first, long int pos ){
          
@@ -79,16 +79,16 @@ dadosOrdeNome* ptrElement ( dadosOrdeNome* first, long int pos ){
 }
 /*
     COMPLEXIBILIDADE DA FUNÇÃO ptrElement
-	66 => 3Trec + T- + Tret + Tchamada(10Trec + 4Tarm + 1Tret)
+	66 => 3Trec + T- + Tret + Tchamada(8Trec + 4Tarm + 1Tret + (2Trec + T>)*n)
     67 => Tret + Trec
     70 => Tarm + Trec
     71 => Tarm + Trec
-    73 => 2Trec + T<
+    73 => (2Trec + T<)*n
     74 => 2Trec + Tarm
     75 2Trec + Tarm
     78 => Trec + Tret
-    RESULTADO => 13Trec + 4Tarm + 3Tret + T- + T< + Tchamada(10Trec + 4Tarm + 1Tret)
-
+    RESULTADO PIOR CASO => 12Trec + 4Tarm + 3Tret + T- + (2Trec + T<)*n + Tchamada(8Trec + 4Tarm + 1Tret + (2Trec + T>)*n)
+    RESULTADO MELHOR CASO => 3Trec + T- + 2Tret + Tchamada(8Trec + 4Tarm + 1Tret + (2Trec + T>)*n)
  */
 
 dadosOrdeNome *ordenarDadosbubble_sort(dadosOrdeNome* first){ 
@@ -113,16 +113,17 @@ dadosOrdeNome *ordenarDadosbubble_sort(dadosOrdeNome* first){
     96 => 2Tarm
     98.1 => 3Trec + T- + 2Tarm+ Tchamada(10Trec + 4Tarm + 1Tret)
     98.2 => (2Trec + T>) * (n+1)
-    98.3 => (2Trec + Tarm)n
+    98.3 => (2Trec + Tarm)*n
     99.1 => 2Trec +Tarm
     99.2 => (2Trec + T<) * n
     99.3 => (2Trec +Tarm) * (n-1)
-    100 => 8Trec + T> + 3Tret + 3Tarm + 2Tchamada(13Trec + 4Tarm + 3Tret + T- + T< + Tchamada(10Trec + 4Tarm + 1Tret)) + Tchamada(strcmp?)
-    101 => 5Trec + 2Tarm  + T- + Tret + Tchamada(13Trec + 4Tarm + 3Tret + T- + T< + Tchamada(10Trec + 4Tarm + 1Tret))
-    102 => 7Trec + 3Tarm + 2Tret + 2Tchamada(13Trec + 4Tarm + 3Tret + T- + T< + Tchamada(10Trec + 4Tarm + 1Tret))
-    103 => 4Trec + 2Tarm + 1Tret + Tchamada(13Trec + 4Tarm + 3Tret + T- + T< + Tchamada(10Trec + 4Tarm + 1Tret))
+    100 => 8Trec + T> + 3Tret + 3Tarm + 2Tchamada(12Trec + 4Tarm + 3Tret + T- + (2Trec + T<)*n + Tchamada(8Trec + 4Tarm + 1Tret + (2Trec + T>)*n)) + Tchamada(strcmp?)
+    101 => 5Trec + 2Tarm  + T- + Tret + Tchamada(12Trec + 4Tarm + 3Tret + T- + (2Trec + T<)*n + Tchamada(8Trec + 4Tarm + 1Tret + (2Trec + T>)*n))
+    102 => 7Trec + 3Tarm + 2Tret + 2Tchamada(12Trec + 4Tarm + 3Tret + T- + (2Trec + T<)*n + Tchamada(8Trec + 4Tarm + 1Tret + (2Trec + T>)*n))
+    103 => 4Trec + 2Tarm + 1Tret + Tchamada(12Trec + 4Tarm + 3Tret + T- + (2Trec + T<)*n + Tchamada(8Trec + 4Tarm + 1Tret + (2Trec + T>)*n))
     108 Trec + Tret  
-    RESULTADO => 14Tarm + 29Trec + 2T- + 8Tret + Tchamada(10Trec + 4Tarm + 1Tret) + 2T> + (2Trec + T>) * n + (2Trec + Tarm)n + (2Trec + T<) * n + (2Trec +Tarm) * n 
+    RESULTADO PIOR CASO=> 14Tarm + 29Trec + 2T- + 8Tret + Tchamada(10Trec + 4Tarm + 1Tret) + 2T> + (2Trec + T>) * n + (2Trec + Tarm)*n + (2Trec + T<) * n + (2Trec +Tarm) * n + 6Tchamada(12Trec + 4Tarm + 3Tret + T- + (2Trec + T<)*n + Tchamada(8Trec + 4Tarm + 1Tret + (2Trec + T>)*n)) 
+	RESULTADO MELHOR CASO=> 7Tarm + 13Trec + 1T- + 4Tret + Tchamada(10Trec + 4Tarm + 1Tret) + 2T> + (2Trec + T>) * n + (2Trec + Tarm)*n + (2Trec + T<) * n + (2Trec +Tarm) * n + 2Tchamada(3Trec + T- + 2Tret + Tchamada(8Trec + 4Tarm + 1Tret + (2Trec + T>)*n)) 
  */
 
 char* transformaSaldoNome( char* char_saldo){
