@@ -1,5 +1,3 @@
-
-
 typedef struct dadosBancarios{
     int id;
     char nome[50];
@@ -8,8 +6,8 @@ typedef struct dadosBancarios{
 
 } dadosBancarios;
 
-dadosBancarios *iniciarlista(){
-	dadosBancarios *dado = (dadosBancarios*)malloc(sizeof(dadosBancarios));
+dadosBancarios* iniciarlista(){
+	dadosBancarios* dado = (dadosBancarios*)malloc(sizeof(dadosBancarios));
 	
 	dado->id = 0;
 	dado->nome[0] = '\0';
@@ -18,7 +16,7 @@ dadosBancarios *iniciarlista(){
 	return dado;
 }
 
-void preencherDados(char *minhaString, dadosBancarios *lista) {
+void preencherDados(char* minhaString, dadosBancarios* lista) {
 	int i;
 	int j = 0;
 	char aux[100];
@@ -57,26 +55,26 @@ void preencherDados(char *minhaString, dadosBancarios *lista) {
     }
 }
 
-dadosBancarios *carregarArquivos( dadosBancarios *lista){
-    FILE *ponteiro_arquivo;
+dadosBancarios* carregarArquivos( dadosBancarios* lista){
+    FILE* ponteiro_arquivo;
     ponteiro_arquivo = fopen("DadosBancoPulini.txt", "r");
 
     if (ponteiro_arquivo == NULL)
-    	printf("ERRO! O arquivo n�o foi aberto!\n");
+    	printf("ERRO! O arquivo não foi aberto!\n");
     
 	else{    	
 		char conteudo[100];
-        printf("O arquivo foi aberto com sucesso!\n");
+        printf("Carregando arquivos...\n");
         while(fgets(conteudo, BUFSIZ, ponteiro_arquivo) != NULL){
             //printf("conteudo: %s", conteudo);        
 		
-        	dadosBancarios *novo = iniciarlista();
+        	dadosBancarios* novo = iniciarlista();
         	preencherDados(conteudo, novo);
         	
         	if(lista->nome[0] == '\0')
         		lista = novo;
         	else{
-        		dadosBancarios *aux = lista;
+        		dadosBancarios* aux = lista;
         		
         		while(aux->prox != NULL){
         			aux = aux->prox;
@@ -88,8 +86,8 @@ dadosBancarios *carregarArquivos( dadosBancarios *lista){
 	return lista;
 }
 
-void imprimeLista(dadosBancarios *lista){
-	dadosBancarios *atual = lista;
+void imprimeLista(dadosBancarios* lista){
+	dadosBancarios* atual = lista;
 
 	printf("\n\n\n\t\t\t===|LISTA DADOS|===\n\n");
 	while(atual != NULL){
