@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "dadosbancooriginal.h": "c"
+        "dadosbancooriginal.h": "c",
+        "string.h": "c"
     }
 }

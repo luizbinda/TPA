@@ -1,5 +1,5 @@
 typedef struct dadosBancarios{
-    int id, excluido;
+    int id;
     char nome[50];
     float saldo;
     struct dadosBancarios *prox;
@@ -8,7 +8,6 @@ typedef struct dadosBancarios{
 
 dadosBancarios* iniciarlista(){
 	dadosBancarios* dado = (dadosBancarios*)malloc(sizeof(dadosBancarios));
-	dado->excluido = 0;
 	dado->id = 0;
 	dado->nome[0] = '\0';
 	dado->saldo = 0;
