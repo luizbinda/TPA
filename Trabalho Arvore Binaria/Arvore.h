@@ -2,7 +2,6 @@ typedef struct Nodo {
     dadosBancarios* cliente;
     struct Nodo* esquerda;
     struct Nodo* direita;
-    //struct Nodo* pai;
     int nivel, altura;
 }Nodo;
 
@@ -21,7 +20,6 @@ Nodo* criarNodo(dadosBancarios* cliente){
 	novo->cliente = cliente;
 	novo->direita = NULL;
 	novo->esquerda = NULL;
-	//novo->pai = NULL;
     novo->nivel = 0;
     novo->altura = 0;
 	return novo;
@@ -127,7 +125,7 @@ int calcularAltura(Nodo* nodo){
 	return 0;
 }
 
-int calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual){
+void calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual){
     if(nodo->cliente->id == valor_procurado)
         nodo->nivel = nivel_atual;
     else if(nodo->cliente->id > valor_procurado){
@@ -139,16 +137,25 @@ int calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual){
 }
 
 int calcularTotalNodos(Nodo* nodo){
+    if (nodo == NULL)
+        return 0;
+    int num_esquerda = calcularTotalNodos(nodo->esquerda);
+    int num_direta = calcularTotalNodos(nodo->direita);
 
+    return num_direta + num_esquerda + 1;
+    
 }
 
-
-int estritamente_bin(Nodo* nodo){
+int estritamenteBinaria(Nodo* nodo){
     if(nodo->direita == NULL && nodo->esquerda == NULL)
         return 1;
 
     if(nodo->direita != NULL && nodo->esquerda != NULL)
-        return estritamente_bin(nodo->esquerda) && estritamente_bin(nodo->direita);
+        return estritamenteBinaria(nodo->esquerda) && estritamenteBinaria(nodo->direita);
 
     return 0;
+}
+
+int completa(Nodo* nodo) {
+
 }

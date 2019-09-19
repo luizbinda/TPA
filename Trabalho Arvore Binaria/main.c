@@ -67,8 +67,9 @@ int main(){
 			}
 			case 5:{
 				system("cls");
-				int numNodo = contarNodos(raiz, 0);
-				printf("Nodos: %d\n", numNodo);
+				printf("Nodos: %d\n", calcularTotalNodos(raiz));
+				printf("completa: %d\n", completa(raiz));
+				
 				system("pause");
 				system("cls");
 				break;
@@ -97,7 +98,7 @@ int main(){
 			}
 			case 8:{
 				system("cls");
-				if(estritamente_bin(raiz) == 1)
+				if(estritamenteBinaria(raiz) == 1)
 					printf("Estritamente Binaria\n");
 				else
 					printf("Nao eh Estritamente Binaria\n");
