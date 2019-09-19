@@ -2,7 +2,7 @@ typedef struct Nodo {
     dadosBancarios* cliente;
     struct Nodo* esquerda;
     struct Nodo* direita;
-    struct Nodo* pai;
+    //struct Nodo* pai;
     int nivel, altura;
 }Nodo;
 
@@ -21,7 +21,7 @@ Nodo* criarNodo(dadosBancarios* cliente){
 	novo->cliente = cliente;
 	novo->direita = NULL;
 	novo->esquerda = NULL;
-	novo->pai = NULL;
+	//novo->pai = NULL;
     novo->nivel = 0;
     novo->altura = 0;
 	return novo;
@@ -30,14 +30,11 @@ Nodo* criarNodo(dadosBancarios* cliente){
 Nodo* inserirNodo(Nodo* nodo, dadosBancarios* cliente){
     if(nodo == NULL)
         nodo = criarNodo(cliente);
-    else if ( cliente->id < nodo->cliente->id) {
+    else if ( cliente->id < nodo->cliente->id) 
         nodo->esquerda = inserirNodo(nodo->esquerda, cliente);
-        nodo->esquerda->pai = nodo;
-    }
-    else {
+    else 
         nodo->direita = inserirNodo(nodo->direita, cliente);
-        nodo->direita->pai = nodo;
-    }
+    
     return nodo;
 }
 
@@ -55,13 +52,11 @@ Nodo* removerNodo(Nodo* nodo, int valor_exluido){
         }            
         else if(nodo->esquerda == NULL){
             Nodo* temporario = nodo;
-            nodo->direita->pai = nodo->pai;
             nodo = nodo->direita;
             free(temporario);
         }
         else if(nodo->direita == NULL){
             Nodo* temporario = nodo;
-            nodo->esquerda->pai = nodo->pai;
             nodo = nodo->esquerda;
             free(temporario);
         }
@@ -143,21 +138,17 @@ int calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual){
     }
 }
 
-int estritamente_bin(Nodo* nodo){
-    if(!nodo->direita && !nodo->esquerda)
-        return 1;
+int calcularTotalNodos(Nodo* nodo){
 
-    if(nodo->direita && nodo->esquerda)
-        return estritamente_bin(nodo->esquerda) && estritamente_bin(nodo->direita);
-
-    return 0;
 }
 
 
-int contarNodos(Nodo* nodo, int num_nodo){
-    if(nodo != NULL){
-        num_nodo = contarNodos(nodo->esquerda, num_nodo);
-        num_nodo = contarNodos(nodo->direita, num_nodo);    
-    }
-    return num_nodo;
+int estritamente_bin(Nodo* nodo){
+    if(nodo->direita == NULL && nodo->esquerda == NULL)
+        return 1;
+
+    if(nodo->direita != NULL && nodo->esquerda != NULL)
+        return estritamente_bin(nodo->esquerda) && estritamente_bin(nodo->direita);
+
+    return 0;
 }
