@@ -15,11 +15,11 @@ int main(){
         printf( "1 - Inserir novo elemento\n"
                 "2 - Exluir elemento\n"
                 "3 - Buscar elemento\n"
-                "4 - Imprimir em ordem Crescente\n"
-                "5 - Imprimir em ordem Decrescente\n"
+                "4 - Imprimir em ordem Crescente e Decrescente\n"
+                "5 - Imprimir total de nodos\n"
                 "6 - Imprimir altura da arvore\n"
                 "7 - Imprimir nivel de um nodo\n"
-                "8 - Estritamente Binaria\n"
+                "8 - Estritamente Binaria e Completa\n"
                 "0 - Sair\n");
         scanf("%d",&op);
 		switch (op){
@@ -62,14 +62,15 @@ int main(){
 				percorrerArvoreEmOrdemCrescente(raiz);
 				system("pause");
 				system("cls");
+				percorrerArvoreEmOrdemDecrescente(raiz);
+				system("pause");
+				system("cls");
 
 				break;
 			}
 			case 5:{
 				system("cls");
-				printf("Nodos: %d\n", calcularTotalNodos(raiz));
-				printf("completa: %d\n", completa(raiz));
-				
+				printf("Nodos: %d\n", calcularTotalNodos(raiz));			
 				system("pause");
 				system("cls");
 				break;
@@ -98,8 +99,10 @@ int main(){
 			}
 			case 8:{
 				system("cls");
-				if(estritamenteBinaria(raiz) == 1)
-					printf("Estritamente Binaria\n");
+				if(estritamenteBinaria(raiz) == 1 && estritamenteBinariaCompleta(raiz) == 1 )
+					printf("Estritamente Binaria e Completa\n");
+				else if(estritamenteBinaria(raiz) == 1 && estritamenteBinariaCompleta(raiz) == 0)
+					printf("Estritamente Binaria e incompleta\n");
 				else
 					printf("Nao eh Estritamente Binaria\n");
 				system("pause");

@@ -152,10 +152,18 @@ int estritamenteBinaria(Nodo* nodo){
 
     if(nodo->direita != NULL && nodo->esquerda != NULL)
         return estritamenteBinaria(nodo->esquerda) && estritamenteBinaria(nodo->direita);
-
     return 0;
 }
 
-int completa(Nodo* nodo) {
+int estritamenteBinariaCompleta(Nodo* nodo) {
+    
+    int altura_direita = calcularAltura(nodo->direita);
+    int altura_esquerda = calcularAltura(nodo->esquerda);
+    int completa;
+    if(altura_esquerda == altura_direita)
+        completa = 1;
+    else
+        completa = 0; 
 
+    return completa && estritamenteBinaria(nodo); 
 }
