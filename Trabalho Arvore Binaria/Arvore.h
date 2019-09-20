@@ -1,12 +1,17 @@
 typedef struct Nodo {
     dadosBancarios* cliente;
+    struct Nodo* pai;
     struct Nodo* esquerda;
     struct Nodo* direita;
     int nivel, altura;
+    // Hashing parametros
+    int exluido_hash;
+    struct Nodo* prox;
 }Nodo;
 
 typedef struct Hashing {
     Nodo** vetor;
+    int total;
 }Hashing;
 
 Nodo* raiz;
@@ -17,27 +22,43 @@ Nodo* removerNodo(Nodo* nodo, int valor_exluido);
 void percorrerArvoreEmOrdemCrescente(Nodo* nodo);
 void percorrerArvoreEmOrdemDecrescente(Nodo* nodo);
 Nodo* buscarValor(Nodo* nodo, int valor_procurado);
-Nodo* carregarArquivos(Nodo* nodo);
-Hashing* iniciarHashing();
-Hashing* iniciarHashing(Hashing* hash, int tamanho_hash);
+Nodo* carregarArquivos(Nodo* nodo, Hashing* hash);
+int calcularAltura(Nodo* nodo);
+void calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual);
+int calcularTotalNodos(Nodo* nodo);
+int estritamenteBinaria(Nodo* nodo);
+Hashing* iniciarHash();
+Hashing* iniciarVetorHash(Hashing* hash, int tamanho_hash);
+int calcularHashPos(Nodo* raiz, int valor, int total);
+int calcularHashPosDivisao(int valor, int total);
+Hashing* inserirHash(Hashing* hash, Nodo* dados, int pos);
+Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos);
 
 Nodo* criarNodo(dadosBancarios* cliente){
     Nodo* novo = (Nodo*)malloc(sizeof(Nodo));
 	novo->cliente = cliente;
+    novo->pai = NULL;
 	novo->direita = NULL;
 	novo->esquerda = NULL;
     novo->nivel = 0;
     novo->altura = 0;
+    // Hashing parametros
+    novo->prox = NULL;
+    novo->exluido_hash = 0;
 	return novo;
 }
 
 Nodo* inserirNodo(Nodo* nodo, dadosBancarios* cliente){
     if(nodo == NULL)
         nodo = criarNodo(cliente);
-    else if ( cliente->id < nodo->cliente->id) 
+    else if ( cliente->id < nodo->cliente->id){
         nodo->esquerda = inserirNodo(nodo->esquerda, cliente);
-    else 
+        nodo->esquerda->pai = nodo;
+    } 
+    else {
         nodo->direita = inserirNodo(nodo->direita, cliente);
+        nodo->direita->pai = nodo;
+    }
     
     return nodo;
 }
@@ -51,27 +72,29 @@ Nodo* removerNodo(Nodo* nodo, int valor_exluido){
         nodo->direita = removerNodo(nodo->direita, valor_exluido);
     else {
         if(nodo->direita == NULL && nodo->esquerda == NULL){
-            free(nodo);
+            //free(nodo);
             nodo = NULL;
         }            
         else if(nodo->esquerda == NULL){
             Nodo* temporario = nodo;
+            nodo->direita->pai = nodo->pai;
             nodo = nodo->direita;
-            free(temporario);
+            //free(temporario);
         }
         else if(nodo->direita == NULL){
             Nodo* temporario = nodo;
+            nodo->esquerda->pai = nodo->pai;
             nodo = nodo->esquerda;
-            free(temporario);
+            //free(temporario);
         }
         else{
             Nodo* temporario = nodo->esquerda;
-            while (temporario->direita != NULL ){
+            while (temporario->direita != NULL )
                 temporario = temporario->direita;
-            }            
-            nodo->cliente->id = temporario->cliente->id;
-            temporario->cliente->id = valor_exluido;
-
+            //Trocando os dados entre os nodos ...
+            nodo->cliente = temporario->cliente;
+            temporario->cliente->id = valor_exluido;            
+            
             nodo->esquerda = removerNodo(nodo->esquerda, valor_exluido);
         }
     }
@@ -104,7 +127,7 @@ Nodo* buscarValor(Nodo* nodo, int valor_procurado){
         buscarValor(nodo->direita, valor_procurado);
 }
 
-Nodo* carregarArquivos(Nodo* raiz){
+Nodo* carregarArquivos(Nodo* raiz, Hashing* hash){
     FILE* ponteiro_arquivo;
     ponteiro_arquivo = fopen("DadosBancoPulini.txt", "r");
 
@@ -113,6 +136,7 @@ Nodo* carregarArquivos(Nodo* raiz){
         dadosBancarios* novo = iniciarlista();
         preencherDados(conteudo, novo);   
         raiz = inserirNodo(raiz, novo);
+        hash = inserirHash(hash, buscarValor(raiz, novo->id), calcularHashPosDivisao(novo->id,50));
     }
     
     return raiz;
@@ -163,16 +187,17 @@ int estritamenteBinaria(Nodo* nodo){
 
 int estritamenteBinariaCompleta(Nodo* nodo) {
     
-    return calcularAltura(nodo->direita) && calcularAltura(nodo->esquerda) && estritamenteBinaria(nodo); 
+    return estritamenteBinaria(nodo) && calcularAltura(nodo->direita) == calcularAltura(nodo->esquerda); 
 }
 
-Hashing* iniciarHashing(){
-    Hashing* hash = (Hashing*) malloc(sizeof(Hashing));
+Hashing* iniciarHash(){
+    Hashing* hash = (Hashing*) malloc(sizeof(Hashing*));
     hash->vetor = NULL;
+    hash->total = 0;
     return hash;
 }
 
-Hashing* iniciarHashing(Hashing* hash, int tamanho_hash){
+Hashing* iniciarVetorHash(Hashing* hash, int tamanho_hash){
     hash->vetor = (Nodo**) malloc(sizeof(Nodo*) * tamanho_hash);
     int i;
     for (i = 0; i < tamanho_hash; i++){
@@ -181,18 +206,70 @@ Hashing* iniciarHashing(Hashing* hash, int tamanho_hash){
     return hash;
 }
 
-int calcularHashing(int pos, Nodo* nodo){
-    
-    if (nodo == NULL)
-        return 0;
-    
-    int num_esquerda = calcularTotalNodos(nodo->esquerda);
-    int num_direta = calcularTotalNodos(nodo->direita);
+int calcularHashPos(Nodo* raiz, int valor, int total){
 
-    return num_direta + num_esquerda + 1;
+    if (raiz->cliente->id > valor )
+        total = calcularHashPos(raiz->esquerda, valor, (1 + total * 2));
+    if (raiz->cliente->id < valor )
+        total = calcularHashPos(raiz->direita, valor, (2 + total * 2));
+
+    return total;
 
 }
 
-Hashing carregarHashing(Hashing* hash, Nodo* nodo){
+int calcularHashPosDivisao(int valor, int total){
+    return valor % total;
+}
 
+Hashing* inserirHash(Hashing* hash, Nodo* dados, int pos){
+
+    if (hash->vetor[pos] == NULL)
+        hash->vetor[pos] = dados;
+    else if (hash->vetor[pos]->exluido_hash == 1){
+        dados->prox = hash->vetor[pos]->prox;
+        hash->vetor[pos] = dados;
+    }        
+    else{
+        Nodo* aux = hash->vetor[pos];
+        while (aux->prox != NULL ){
+            if (aux->prox->exluido_hash == 1)
+                break;            
+            aux = aux->prox;
+        }
+        if (aux->prox != NULL)
+            dados->prox = aux->prox->prox;
+                           
+        aux->prox = dados;
+    }
+    return hash;
+}
+
+Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos){
+    if (hash->vetor[pos] == NULL)
+        return NULL;
+    else if (hash->vetor[pos]->exluido_hash == 1)
+        return hash->vetor[pos];
+    else{
+        Nodo* aux = hash->vetor[pos];
+        while (aux != NULL ){
+            if (aux->cliente->id == pesquisado)
+                return aux;           
+            aux = aux->prox;
+        }
+    }
+    return NULL;
+}
+
+void listarHashFechada(Hashing* hash, int tamanho_hash){
+    int i;
+    Nodo* aux; 
+    for (i = 0; i < tamanho_hash; i++){
+        aux = hash->vetor[i];
+        while (aux != NULL) {
+           if(aux->exluido_hash == 0)
+                printf("\tpos[%d] - id: %i\n", i, aux->cliente->id);
+            
+            aux = aux->prox;
+        }   
+    }
 }
