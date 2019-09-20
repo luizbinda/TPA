@@ -5,6 +5,10 @@ typedef struct Nodo {
     int nivel, altura;
 }Nodo;
 
+typedef struct Hashing {
+    Nodo** vetor;
+}Hashing;
+
 Nodo* raiz;
 
 Nodo* criarNodo(dadosBancarios* cliente);
@@ -14,6 +18,8 @@ void percorrerArvoreEmOrdemCrescente(Nodo* nodo);
 void percorrerArvoreEmOrdemDecrescente(Nodo* nodo);
 Nodo* buscarValor(Nodo* nodo, int valor_procurado);
 Nodo* carregarArquivos(Nodo* nodo);
+Hashing* iniciarHashing();
+Hashing* iniciarHashing(Hashing* hash, int tamanho_hash);
 
 Nodo* criarNodo(dadosBancarios* cliente){
     Nodo* novo = (Nodo*)malloc(sizeof(Nodo));
@@ -157,13 +163,36 @@ int estritamenteBinaria(Nodo* nodo){
 
 int estritamenteBinariaCompleta(Nodo* nodo) {
     
-    int altura_direita = calcularAltura(nodo->direita);
-    int altura_esquerda = calcularAltura(nodo->esquerda);
-    int completa;
-    if(altura_esquerda == altura_direita)
-        completa = 1;
-    else
-        completa = 0; 
+    return calcularAltura(nodo->direita) && calcularAltura(nodo->esquerda) && estritamenteBinaria(nodo); 
+}
 
-    return completa && estritamenteBinaria(nodo); 
+Hashing* iniciarHashing(){
+    Hashing* hash = (Hashing*) malloc(sizeof(Hashing));
+    hash->vetor = NULL;
+    return hash;
+}
+
+Hashing* iniciarHashing(Hashing* hash, int tamanho_hash){
+    hash->vetor = (Nodo**) malloc(sizeof(Nodo*) * tamanho_hash);
+    int i;
+    for (i = 0; i < tamanho_hash; i++){
+        hash->vetor[i] = NULL;
+    }
+    return hash;
+}
+
+int calcularHashing(int pos, Nodo* nodo){
+    
+    if (nodo == NULL)
+        return 0;
+    
+    int num_esquerda = calcularTotalNodos(nodo->esquerda);
+    int num_direta = calcularTotalNodos(nodo->direita);
+
+    return num_direta + num_esquerda + 1;
+
+}
+
+Hashing carregarHashing(Hashing* hash, Nodo* nodo){
+
 }
