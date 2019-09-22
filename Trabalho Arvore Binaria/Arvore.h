@@ -1,6 +1,7 @@
+#define TAMVET 500
+
 typedef struct Nodo {
     dadosBancarios* cliente;
-    struct Nodo* pai;
     struct Nodo* esquerda;
     struct Nodo* direita;
     int nivel, altura;
@@ -11,16 +12,14 @@ typedef struct Nodo {
 
 typedef struct Hashing {
     Nodo** vetor;
-    int total;
 }Hashing;
 
 Nodo* raiz;
 Hashing* hash;
 
-
 Nodo* criarNodo(dadosBancarios* cliente);
 Nodo* inserirNodo(Nodo* nodo, dadosBancarios* cliente);
-Nodo* removerNodo(Nodo* nodo, int valor_exluido);
+Nodo* removerNodo(Nodo** nodo, int valor_exluido);
 void percorrerArvoreEmOrdemCrescente(Nodo* nodo);
 void percorrerArvoreEmOrdemDecrescente(Nodo* nodo);
 Nodo* buscarValor(Nodo* nodo, int valor_procurado);
@@ -35,11 +34,14 @@ int calcularHashPos(Hashing* raiz, int valor, int total);
 int calcularHashPosDivisao(int valor, int total);
 Hashing* inserirHash(Hashing* hash, Nodo* dados, int pos);
 Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos);
+Hashing* excluirHash(Hashing* hash, int id_exluido);
+void listarHashFechada(Hashing* hash, int tamanho_hash);
+Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida);
+int verificarEspelhamento(Nodo* nodo, Hashing* arvore_invertida, int pos);
 
 Nodo* criarNodo(dadosBancarios* cliente){
     Nodo* novo = (Nodo*)malloc(sizeof(Nodo));
 	novo->cliente = cliente;
-    novo->pai = NULL;
 	novo->direita = NULL;
 	novo->esquerda = NULL;
     novo->nivel = 0;
@@ -53,53 +55,49 @@ Nodo* criarNodo(dadosBancarios* cliente){
 Nodo* inserirNodo(Nodo* nodo, dadosBancarios* cliente){
     if(nodo == NULL)
         nodo = criarNodo(cliente);
-    else if ( cliente->id < nodo->cliente->id){
+    else if ( cliente->id < nodo->cliente->id)
         nodo->esquerda = inserirNodo(nodo->esquerda, cliente);
-        nodo->esquerda->pai = nodo;
-    } 
-    else {
+    else 
         nodo->direita = inserirNodo(nodo->direita, cliente);
-        nodo->direita->pai = nodo;
-    }
-    
+
     return nodo;
 }
 
-Nodo* removerNodo(Nodo* nodo, int valor_exluido){
-    if(nodo == NULL)
+Nodo* removerNodo(Nodo** nodo, int valor_exluido){
+    if((*nodo) == NULL)
         return NULL;
-    else if (nodo->cliente->id > valor_exluido) 
-        nodo->esquerda = removerNodo(nodo->esquerda, valor_exluido);
-    else if( nodo->cliente->id < valor_exluido)
-        nodo->direita = removerNodo(nodo->direita, valor_exluido);
+    else if ((*nodo)->cliente->id > valor_exluido) 
+        (*nodo)->esquerda = removerNodo(&(*nodo)->esquerda, valor_exluido);
+    else if( (*nodo)->cliente->id < valor_exluido)
+        (*nodo)->direita = removerNodo(&(*nodo)->direita, valor_exluido);
     else {
-        if(nodo->direita == NULL && nodo->esquerda == NULL){
-            //free(nodo);
-            nodo = NULL;
+        if((*nodo)->direita == NULL && (*nodo)->esquerda == NULL){
+            //free((*nodo));
+            (*nodo) = NULL;
         }            
-        else if(nodo->esquerda == NULL){
-            Nodo* temporario = nodo;
-            nodo->direita->pai = nodo->pai;
-            nodo = nodo->direita;
+        else if((*nodo)->esquerda == NULL){
+            //Nodo* temporario = (*nodo);
+            (*nodo) = (*nodo)->direita;
             //free(temporario);
         }
-        else if(nodo->direita == NULL){
-            Nodo* temporario = nodo;
-            nodo->esquerda->pai = nodo->pai;
-            nodo = nodo->esquerda;
+        else if((*nodo)->direita == NULL){
+           // Nodo* temporario = (*nodo);
+            (*nodo) = (*nodo)->esquerda;
             //free(temporario);
         }
         else{
-            Nodo* temporario = nodo->esquerda;
+            Nodo* temporario = (*nodo)->esquerda;
             while (temporario->direita != NULL )
                 temporario = temporario->direita;
-            //Trocando os dados entre os nodos ...
-            nodo->cliente = temporario->cliente;
-            temporario->cliente->id = valor_exluido;            
+            //Trocando os dados entre os nodos...
+            dadosBancarios* aux = (*nodo)->cliente;
+            (*nodo)->cliente = temporario->cliente;
+            temporario->cliente = aux;         
             
-            nodo->esquerda = removerNodo(nodo->esquerda, valor_exluido);
+            (*nodo)->esquerda = removerNodo(&(*nodo)->esquerda, valor_exluido);
         }
     }
+    return (*nodo);
 }
 
 void percorrerArvoreEmOrdemCrescente(Nodo* nodo){
@@ -184,6 +182,7 @@ int estritamenteBinaria(Nodo* nodo){
 
     if(nodo->direita != NULL && nodo->esquerda != NULL)
         return estritamenteBinaria(nodo->esquerda) && estritamenteBinaria(nodo->direita);
+    
     return 0;
 }
 
@@ -195,7 +194,6 @@ int estritamenteBinariaCompleta(Nodo* nodo) {
 Hashing* iniciarHash(){
     Hashing* hash = (Hashing*) malloc(sizeof(Hashing*));
     hash->vetor = NULL;
-    hash->total = 0;
     return hash;
 }
 
@@ -265,6 +263,22 @@ Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos){
     return NULL;
 }
 
+Hashing* excluirHash(Hashing* hash, int id_exluido){
+    Nodo* aux = pesquisarHash(hash, id_exluido, calcularHashPosDivisao(id_exluido, TAMVET));
+    
+    if (aux == NULL)
+        printf("O id que deseja excluir nao existe...\n");	
+                    
+    else if ( aux->exluido_hash == 1)
+        printf("O id pesquisado ja foi excluido!\n");
+
+    else{
+        aux->exluido_hash = 1;
+    }
+
+    return hash;
+}
+
 void listarHashFechada(Hashing* hash, int tamanho_hash){
     int i;
     Nodo* aux; 
@@ -293,15 +307,18 @@ Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida){
 }
 
 int verificarEspelhamento(Nodo* nodo, Hashing* arvore_invertida, int pos) {
-    
-    if(nodo != NULL && arvore_invertida->vetor[pos] != NULL){
-        if (nodo->cliente->id == arvore_invertida->vetor[pos]->cliente->id){ 
-            
-        }
-        else
-            return 0;
-    }
-    else
-        return 0;
-       
+    int espelho;
+    if(nodo != NULL && arvore_invertida->vetor[pos] != NULL && nodo->cliente->id == arvore_invertida->vetor[pos]->cliente->id)
+        espelho = 1;
+    if(nodo == NULL && arvore_invertida->vetor[pos] == NULL)
+        espelho = 1;
+    if(nodo != NULL && arvore_invertida->vetor[pos] != NULL && nodo->cliente->id != arvore_invertida->vetor[pos]->cliente->id)
+        espelho = 0;
+    if((nodo == NULL && arvore_invertida->vetor[pos] != NULL) || (nodo != NULL && arvore_invertida->vetor[pos] == NULL))
+        espelho = 0;
+    if(nodo != NULL && arvore_invertida->vetor[pos] != NULL)
+        espelho = verificarEspelhamento(nodo->esquerda, arvore_invertida, (2 + pos * 2)) && verificarEspelhamento(nodo->direita, arvore_invertida, (1 + pos * 2));
+        
+    return espelho;
 }
+

@@ -5,7 +5,6 @@
 #include "DadosBancoOriginal.h"
 #include "Arvore.h"
 
-#define TAMVET 500
 int main(){
    	raiz = NULL;
 	hash = iniciarHash();
@@ -22,7 +21,8 @@ int main(){
                 "5 - Imprimir total de nodos\n"
                 "6 - Imprimir altura da arvore\n"
                 "7 - Imprimir nivel de um nodo\n"
-                "8 - Estritamente Binaria e Completa\n"
+                "8 - Verificar Arvore Estritamente Binaria e Completa\n"
+                "9 - Verificar Espelhamento\n"
                 "0 - Sair\n");
         scanf("%d",&op);
 		switch (op){
@@ -34,7 +34,7 @@ int main(){
 				system("cls");
 				novo->id = valor;
 				raiz = inserirNodo(raiz, novo);
-				hash = inserirHash(hash, buscarValor(raiz, novo->id), calcularHashPosDivisao(novo->id,50));
+				hash = inserirHash(hash, buscarValor(raiz, novo->id), calcularHashPosDivisao(novo->id,TAMVET));
 				
 				system("pause");
 				system("cls");
@@ -45,8 +45,9 @@ int main(){
 				printf("Digite o numero que deseja Excluir: ");
 				scanf("%d", &valor);
 				system("cls");
-				removerNodo(raiz, valor);
-
+				hash = excluirHash(hash, valor);
+				removerNodo(&raiz, valor);
+				
 				system("pause");
 				system("cls");
 				break;			
@@ -70,7 +71,7 @@ int main(){
 
 					// contando tempo e buscando valor na hash
 					double inicio_buscar_hash = (double)clock();
-					aux = pesquisarHash(hash, valor, calcularHashPosDivisao(valor, 50));
+					aux = pesquisarHash(hash, valor, calcularHashPosDivisao(valor, TAMVET));
 					double fim_buscar_hash = (double)clock();
 					double total_tempo_hash = (double) (inicio_buscar_hash - fim_buscar_hash) / CLOCKS_PER_SEC;
 					printf("Hash tempo : %lf -- Id: %d  Saldo: %f  Nome: %s\n", total_tempo_hash, aux->cliente->id, aux->cliente->saldo, aux->cliente->nome);
@@ -95,11 +96,6 @@ int main(){
 				percorrerArvoreEmOrdemDecrescente(raiz);
 				system("pause");
 				system("cls");
-				listarHashFechada(hash, 50);
-
-				system("pause");
-				system("cls");
-				
 				break;
 			}
 			case 5:{
@@ -123,10 +119,11 @@ int main(){
 				printf("Digite o numero que deseja Buscar: ");
 				scanf("%d", &valor);
 				system("cls");
-				calcularNivel(raiz, valor, 0);			
 				Nodo* aux = buscarValor(raiz, valor);
-				if(aux != NULL)
+				if(aux != NULL){
+					calcularNivel(raiz, valor, 0);			
 					printf("Nivel: %d\n", aux->nivel);
+				}
 				else
 					printf("Nodo não encontrado\n");
 
@@ -148,12 +145,19 @@ int main(){
 				break;
 			}
 			case 9:{
+				system("cls");
 				Hashing* arvore_invertida;
 				arvore_invertida = iniciarHash();
 				arvore_invertida = iniciarVetorHash(arvore_invertida, TAMVET);
 				arvore_invertida = carregarArvoreInvertida(raiz, arvore_invertida);
-				listarHashFechada(arvore_invertida, TAMVET);
+
+				if (verificarEspelhamento(raiz, arvore_invertida, 0) == 1)
+					printf("Arvore espelhada!\n");
+				else
+					printf("Arvore Nao espelhada!\n");
+				
 				free(arvore_invertida);
+				
 				system("pause");
 				system("cls");
 
