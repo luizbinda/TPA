@@ -15,6 +15,8 @@ typedef struct Hashing {
 }Hashing;
 
 Nodo* raiz;
+Hashing* hash;
+
 
 Nodo* criarNodo(dadosBancarios* cliente);
 Nodo* inserirNodo(Nodo* nodo, dadosBancarios* cliente);
@@ -29,7 +31,7 @@ int calcularTotalNodos(Nodo* nodo);
 int estritamenteBinaria(Nodo* nodo);
 Hashing* iniciarHash();
 Hashing* iniciarVetorHash(Hashing* hash, int tamanho_hash);
-int calcularHashPos(Nodo* raiz, int valor, int total);
+int calcularHashPos(Hashing* raiz, int valor, int total);
 int calcularHashPosDivisao(int valor, int total);
 Hashing* inserirHash(Hashing* hash, Nodo* dados, int pos);
 Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos);
@@ -206,15 +208,18 @@ Hashing* iniciarVetorHash(Hashing* hash, int tamanho_hash){
     return hash;
 }
 
-int calcularHashPos(Nodo* raiz, int valor, int total){
+int calcularHashPos(Hashing* raiz, int valor, int total){
 
-    if (raiz->cliente->id > valor )
-        total = calcularHashPos(raiz->esquerda, valor, (1 + total * 2));
-    if (raiz->cliente->id < valor )
-        total = calcularHashPos(raiz->direita, valor, (2 + total * 2));
+    if (raiz->vetor[total] == NULL )
+        return total;
+    else {
+        if (raiz->vetor[total]->cliente->id < valor )
+            total = calcularHashPos(raiz, valor, (1 + total * 2));
 
+        else if (raiz->vetor[total]->cliente->id > valor )
+            total = calcularHashPos(raiz, valor, (2 + total * 2));
+    }
     return total;
-
 }
 
 int calcularHashPosDivisao(int valor, int total){
@@ -272,4 +277,31 @@ void listarHashFechada(Hashing* hash, int tamanho_hash){
             aux = aux->prox;
         }   
     }
+}
+
+Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida){
+    FILE* ponteiro_arquivo;
+    ponteiro_arquivo = fopen("DadosBancoPulini2.txt", "r");
+    char conteudo[100];
+    while(fgets(conteudo, BUFSIZ, ponteiro_arquivo) != NULL){
+        dadosBancarios* novo = iniciarlista();
+        preencherDados(conteudo, novo);
+        Nodo* novo_nodo = criarNodo(novo);
+        arvore_invertida = inserirHash(arvore_invertida, novo_nodo, calcularHashPos(arvore_invertida, novo->id, 0));
+    }
+    return arvore_invertida;
+}
+
+int verificarEspelhamento(Nodo* nodo, Hashing* arvore_invertida, int pos) {
+    
+    if(nodo != NULL && arvore_invertida->vetor[pos] != NULL){
+        if (nodo->cliente->id == arvore_invertida->vetor[pos]->cliente->id){ 
+            
+        }
+        else
+            return 0;
+    }
+    else
+        return 0;
+       
 }

@@ -5,11 +5,11 @@
 #include "DadosBancoOriginal.h"
 #include "Arvore.h"
 
+#define TAMVET 500
 int main(){
    	raiz = NULL;
-	Hashing* hash;
 	hash = iniciarHash();
-	hash = iniciarVetorHash(hash, 50);
+	hash = iniciarVetorHash(hash, TAMVET);
 	raiz = carregarArquivos(raiz, hash);
 
 	int op = -1;
@@ -66,17 +66,17 @@ int main(){
 				
 				// Verificando se enconrou o numero pesquisado
 				if(aux != NULL){
-					printf("Arvore tempo: %d --Id: %d  Saldo: %f  Nome: %s\n", total_tempo_arvore, aux->cliente->id, aux->cliente->saldo, aux->cliente->nome);
+					printf("Arvore tempo: %lf --Id: %d  Saldo: %f  Nome: %s\n", total_tempo_arvore, aux->cliente->id, aux->cliente->saldo, aux->cliente->nome);
 
 					// contando tempo e buscando valor na hash
 					double inicio_buscar_hash = (double)clock();
 					aux = pesquisarHash(hash, valor, calcularHashPosDivisao(valor, 50));
 					double fim_buscar_hash = (double)clock();
 					double total_tempo_hash = (double) (inicio_buscar_hash - fim_buscar_hash) / CLOCKS_PER_SEC;
-					printf("Hash tempo : %d -- Id: %d  Saldo: %f  Nome: %s\n", total_tempo_hash, aux->cliente->id, aux->cliente->saldo, aux->cliente->nome);
-					printf("tempo ini Arvore %d -- tempo fim Hash %d \n", inicio_buscar_arvore, fim_buscar_arvore);
-					printf("tempo ini Hash %d -- tempo fim Arvore %d \n", inicio_buscar_hash, fim_buscar_hash);
-					printf("difrenca entre tempos: %d \n",total_tempo_arvore - total_tempo_hash);
+					printf("Hash tempo : %lf -- Id: %d  Saldo: %f  Nome: %s\n", total_tempo_hash, aux->cliente->id, aux->cliente->saldo, aux->cliente->nome);
+					printf("tempo ini Arvore %lf -- tempo fim Hash %lf \n", inicio_buscar_arvore, fim_buscar_arvore);
+					printf("tempo ini Hash %lf -- tempo fim Arvore %lf \n", inicio_buscar_hash, fim_buscar_hash);
+					printf("difrenca entre tempos: %lf \n",total_tempo_arvore - total_tempo_hash);
 				
 				}
 				else
@@ -91,7 +91,7 @@ int main(){
 				percorrerArvoreEmOrdemCrescente(raiz);
 				system("pause");
 				system("cls");
-				/*
+				
 				percorrerArvoreEmOrdemDecrescente(raiz);
 				system("pause");
 				system("cls");
@@ -99,7 +99,7 @@ int main(){
 
 				system("pause");
 				system("cls");
-				*/
+				
 				break;
 			}
 			case 5:{
@@ -145,6 +145,18 @@ int main(){
 
 				system("pause");
 				system("cls");
+				break;
+			}
+			case 9:{
+				Hashing* arvore_invertida;
+				arvore_invertida = iniciarHash();
+				arvore_invertida = iniciarVetorHash(arvore_invertida, TAMVET);
+				arvore_invertida = carregarArvoreInvertida(raiz, arvore_invertida);
+				listarHashFechada(arvore_invertida, TAMVET);
+				free(arvore_invertida);
+				system("pause");
+				system("cls");
+
 				break;
 			}
 		}
