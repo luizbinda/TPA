@@ -28,6 +28,8 @@ int calcularAltura(Nodo* nodo);
 void calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual);
 int calcularTotalNodos(Nodo* nodo);
 int estritamenteBinaria(Nodo* nodo);
+int completa(Nodo* nodo);
+int estritamenteBinariaCompleta(Nodo* nodo);
 Hashing* iniciarHash();
 Hashing* iniciarVetorHash(Hashing* hash, int tamanho_hash);
 int calcularHashPos(Hashing* raiz, int valor, int total);
@@ -186,9 +188,23 @@ int estritamenteBinaria(Nodo* nodo){
     return 0;
 }
 
+int completa(Nodo* nodo){
+    if (nodo == NULL)
+        return 1;     
+
+    int mesmoTamanho = 0;
+    int alturaEsquerda = calcularAltura(nodo->esquerda);
+    int alturaDireita = calcularAltura(nodo->direita);
+
+    if (alturaEsquerda == alturaDireita || alturaEsquerda == alturaDireita + 1) {
+        mesmoTamanho = 1;
+    }        
+
+    return mesmoTamanho && completa(nodo->esquerda) && completa(nodo->direita);
+}
+
 int estritamenteBinariaCompleta(Nodo* nodo) {
-    
-    return estritamenteBinaria(nodo) && calcularAltura(nodo->direita) == calcularAltura(nodo->esquerda); 
+    return estritamenteBinaria(nodo) && completa(nodo->esquerda); 
 }
 
 Hashing* iniciarHash(){
