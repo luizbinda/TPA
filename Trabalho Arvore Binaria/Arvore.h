@@ -5,9 +5,6 @@ typedef struct Nodo {
     struct Nodo* esquerda;
     struct Nodo* direita;
     int nivel, altura;
-    // Hashing parametros
-    int exluido_hash;
-    struct Nodo* prox;
 }Nodo;
 
 typedef struct Hashing {
@@ -28,6 +25,7 @@ int calcularAltura(Nodo* nodo);
 void calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual);
 int calcularTotalNodos(Nodo* nodo);
 int estritamenteBinaria(Nodo* nodo);
+/////////////////////// Hash
 Hashing* iniciarHash();
 Hashing* iniciarVetorHash(Hashing* hash, int tamanho_hash);
 int calcularHashPos(Hashing* raiz, int valor, int total);
@@ -46,9 +44,6 @@ Nodo* criarNodo(dadosBancarios* cliente){
 	novo->esquerda = NULL;
     novo->nivel = 0;
     novo->altura = 0;
-    // Hashing parametros
-    novo->prox = NULL;
-    novo->exluido_hash = 0;
 	return novo;
 }
 
@@ -72,18 +67,18 @@ Nodo* removerNodo(Nodo** nodo, int valor_exluido){
         (*nodo)->direita = removerNodo(&(*nodo)->direita, valor_exluido);
     else {
         if((*nodo)->direita == NULL && (*nodo)->esquerda == NULL){
-            //free((*nodo));
+            free((*nodo));
             (*nodo) = NULL;
         }            
         else if((*nodo)->esquerda == NULL){
-            //Nodo* temporario = (*nodo);
+            Nodo* temporario = (*nodo);
             (*nodo) = (*nodo)->direita;
-            //free(temporario);
+            free(temporario);
         }
         else if((*nodo)->direita == NULL){
-           // Nodo* temporario = (*nodo);
+            Nodo* temporario = (*nodo);
             (*nodo) = (*nodo)->esquerda;
-            //free(temporario);
+            free(temporario);
         }
         else{
             Nodo* temporario = (*nodo)->esquerda;
@@ -228,21 +223,12 @@ Hashing* inserirHash(Hashing* hash, Nodo* dados, int pos){
 
     if (hash->vetor[pos] == NULL)
         hash->vetor[pos] = dados;
-    else if (hash->vetor[pos]->exluido_hash == 1){
-        dados->prox = hash->vetor[pos]->prox;
-        hash->vetor[pos] = dados;
-    }        
+
     else{
-        Nodo* aux = hash->vetor[pos];
-        while (aux->prox != NULL ){
-            if (aux->prox->exluido_hash == 1)
-                break;            
-            aux = aux->prox;
-        }
-        if (aux->prox != NULL)
-            dados->prox = aux->prox->prox;
-                           
-        aux->prox = dados;
+        if ( hash->vetor[pos]->cliente->id < dados->cliente->id)
+            hash->vetor[pos] = inserirNodo(nodo->esquerda, cliente);
+        else 
+            nodo->direita = inserirNodo(nodo->direita, cliente);
     }
     return hash;
 }
