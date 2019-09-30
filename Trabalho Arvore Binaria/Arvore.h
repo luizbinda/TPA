@@ -225,10 +225,8 @@ Hashing* inserirHash(Hashing* hash, Nodo* dados, int pos){
         hash->vetor[pos] = dados;
 
     else{
-        if ( hash->vetor[pos]->cliente->id < dados->cliente->id)
-            hash->vetor[pos] = inserirNodo(nodo->esquerda, cliente);
-        else 
-            nodo->direita = inserirNodo(nodo->direita, cliente);
+        Nodo* aux = hash->vetor[pos];
+        aux = inserirNodo( aux, aux->cliente);
     }
     return hash;
 }
@@ -239,11 +237,8 @@ Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos){
     else if (hash->vetor[pos]->exluido_hash == 1)
         return hash->vetor[pos];
     else{
-        Nodo* aux = hash->vetor[pos];
-        while (aux != NULL ){
-            if (aux->cliente->id == pesquisado)
-                return aux;           
-            aux = aux->prox;
+        Nodo* aux = buscarValor(raiz, valor);
+        return aux;
         }
     }
     return NULL;
