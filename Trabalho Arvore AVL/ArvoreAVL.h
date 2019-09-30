@@ -4,7 +4,10 @@ typedef struct Nodo {
     dadosBancarios* cliente;
     struct Nodo* esquerda;
     struct Nodo* direita;
-    int nivel, altura;
+    int nivel, altura, fator_balanceamento;
+    // Hashing parametros
+    int exluido_hash;
+    struct Nodo* prox;
 }Nodo;
 
 typedef struct Hashing {
@@ -23,14 +26,10 @@ Nodo* buscarValor(Nodo* nodo, int valor_procurado);
 Nodo* carregarArquivos(Nodo* nodo, Hashing* hash);
 int calcularAltura(Nodo* nodo);
 void calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual);
-int calcularTotalNodos(Nodo* nodo);
-int estritamenteBinaria(Nodo* nodo);
-<<<<<<< HEAD
-int completa(Nodo* nodo);
-int estritamenteBinariaCompleta(Nodo* nodo);
-=======
-/////////////////////// Hash
->>>>>>> 2fa937587a219edbecde3c76c2c11c7a0f7af2ec
+Nodo* rotacaoParaDireita(Nodo* nodo);
+Nodo* rotacaoParaEsquerda(Nodo* nodo);
+
+//Hashing
 Hashing* iniciarHash();
 Hashing* iniciarVetorHash(Hashing* hash, int tamanho_hash);
 int calcularHashPos(Hashing* raiz, int valor, int total);
@@ -40,7 +39,6 @@ Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos);
 Hashing* excluirHash(Hashing* hash, int id_exluido);
 void listarHashFechada(Hashing* hash, int tamanho_hash);
 Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida);
-int verificarEspelhamento(Nodo* nodo, Hashing* arvore_invertida, int pos);
 
 Nodo* criarNodo(dadosBancarios* cliente){
     Nodo* novo = (Nodo*)malloc(sizeof(Nodo));
@@ -49,6 +47,10 @@ Nodo* criarNodo(dadosBancarios* cliente){
 	novo->esquerda = NULL;
     novo->nivel = 0;
     novo->altura = 0;
+    novo->fator_balanceamento = 0; 
+    // Hashing parametros
+    novo->prox = NULL;
+    novo->exluido_hash = 0;
 	return novo;
 }
 
@@ -72,18 +74,18 @@ Nodo* removerNodo(Nodo** nodo, int valor_exluido){
         (*nodo)->direita = removerNodo(&(*nodo)->direita, valor_exluido);
     else {
         if((*nodo)->direita == NULL && (*nodo)->esquerda == NULL){
-            free((*nodo));
+            //free((*nodo));
             (*nodo) = NULL;
         }            
         else if((*nodo)->esquerda == NULL){
-            Nodo* temporario = (*nodo);
+            //Nodo* temporario = (*nodo);
             (*nodo) = (*nodo)->direita;
-            free(temporario);
+            //free(temporario);
         }
         else if((*nodo)->direita == NULL){
-            Nodo* temporario = (*nodo);
+           // Nodo* temporario = (*nodo);
             (*nodo) = (*nodo)->esquerda;
-            free(temporario);
+            //free(temporario);
         }
         else{
             Nodo* temporario = (*nodo)->esquerda;
@@ -166,44 +168,49 @@ void calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual){
     }
 }
 
-int calcularTotalNodos(Nodo* nodo){
-    if (nodo == NULL)
-        return 0;
-    int num_esquerda = calcularTotalNodos(nodo->esquerda);
-    int num_direta = calcularTotalNodos(nodo->direita);
+Nodo* rotacaoParaDireita(Nodo* nodo) {
+    // Fazendo a movimentação necessária
+    Nodo* nodo_esquerda = nodo->esquerda;
+    nodo->esquerda = nodo_esquerda->direita;
+    nodo_esquerda->direita = nodo;
 
-    return num_direta + num_esquerda + 1;
-    
+    // Caso o nodo for a raiz global, atualiza-se o valor da raiz global
+    if (nodo == raiz)
+        raiz = nodo_esquerda;
+
+    // Atualizando os fatores de balanceamento
+    nodo_esquerda->fb = calcularAltura(nodo_esquerda->direita) - calcularAltura(nodo_esquerda->esquerda);
+    nodo->fb = calcularAltura(nodo->direita) - calcularAltura(nodo->esquerda);
+
+    return nodo_esquerda;
 }
 
-int estritamenteBinaria(Nodo* nodo){
-    if(nodo->direita == NULL && nodo->esquerda == NULL)
-        return 1;
+Nodo* rotacaoParaEsquerda(Nodo* nodo) {
+    // Fazendo a movimentação necessária
+    Nodo* nodo_direita = nodo->esquerda;
+    nodo->esquerda = nodo_direita->esquerda;
+    nodo_direita->esquerda = nodo;
 
-    if(nodo->direita != NULL && nodo->esquerda != NULL)
-        return estritamenteBinaria(nodo->esquerda) && estritamenteBinaria(nodo->direita);
-    
-    return 0;
+    // Caso o nodo for a raiz global, atualiza-se o valor da raiz global
+    if (nodo == raiz)
+        raiz = nodo_direita;
+
+    // Atualizando os fatores de balanceamento
+    nodo_direita->fb = calcularAltura(nodo_direita->direita) - calcularAltura(nodo_direita->esquerda);
+    nodo->fb = calcularAltura(nodo->direita) - calcularAltura(nodo->esquerda);
+
+    return nodo_direita;
 }
 
-int completa(Nodo* nodo){
-    if (nodo == NULL)
-        return 1;     
 
-    int mesmoTamanho = 0;
-    int alturaEsquerda = calcularAltura(nodo->esquerda);
-    int alturaDireita = calcularAltura(nodo->direita);
 
-    if (alturaEsquerda == alturaDireita || alturaEsquerda == alturaDireita + 1) {
-        mesmoTamanho = 1;
-    }        
 
-    return mesmoTamanho && completa(nodo->esquerda) && completa(nodo->direita);
-}
 
-int estritamenteBinariaCompleta(Nodo* nodo) {
-    return estritamenteBinaria(nodo) && completa(nodo->esquerda); 
-}
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Hashing* iniciarHash(){
     Hashing* hash = (Hashing*) malloc(sizeof(Hashing*));
@@ -242,10 +249,21 @@ Hashing* inserirHash(Hashing* hash, Nodo* dados, int pos){
 
     if (hash->vetor[pos] == NULL)
         hash->vetor[pos] = dados;
-
+    else if (hash->vetor[pos]->exluido_hash == 1){
+        dados->prox = hash->vetor[pos]->prox;
+        hash->vetor[pos] = dados;
+    }        
     else{
         Nodo* aux = hash->vetor[pos];
-        aux = inserirNodo( aux, aux->cliente);
+        while (aux->prox != NULL ){
+            if (aux->prox->exluido_hash == 1)
+                break;            
+            aux = aux->prox;
+        }
+        if (aux->prox != NULL)
+            dados->prox = aux->prox->prox;
+                           
+        aux->prox = dados;
     }
     return hash;
 }
@@ -256,8 +274,11 @@ Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos){
     else if (hash->vetor[pos]->exluido_hash == 1)
         return hash->vetor[pos];
     else{
-        Nodo* aux = buscarValor(raiz, valor);
-        return aux;
+        Nodo* aux = hash->vetor[pos];
+        while (aux != NULL ){
+            if (aux->cliente->id == pesquisado)
+                return aux;           
+            aux = aux->prox;
         }
     }
     return NULL;
@@ -304,21 +325,5 @@ Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida){
         arvore_invertida = inserirHash(arvore_invertida, novo_nodo, calcularHashPos(arvore_invertida, novo->id, 0));
     }
     return arvore_invertida;
-}
-
-int verificarEspelhamento(Nodo* nodo, Hashing* arvore_invertida, int pos) {
-    int espelho;
-    if(nodo != NULL && arvore_invertida->vetor[pos] != NULL && nodo->cliente->id == arvore_invertida->vetor[pos]->cliente->id)
-        espelho = 1;
-    if(nodo == NULL && arvore_invertida->vetor[pos] == NULL)
-        espelho = 1;
-    if(nodo != NULL && arvore_invertida->vetor[pos] != NULL && nodo->cliente->id != arvore_invertida->vetor[pos]->cliente->id)
-        espelho = 0;
-    if((nodo == NULL && arvore_invertida->vetor[pos] != NULL) || (nodo != NULL && arvore_invertida->vetor[pos] == NULL))
-        espelho = 0;
-    if(nodo != NULL && arvore_invertida->vetor[pos] != NULL)
-        espelho = verificarEspelhamento(nodo->esquerda, arvore_invertida, (2 + pos * 2)) && verificarEspelhamento(nodo->direita, arvore_invertida, (1 + pos * 2));
-        
-    return espelho;
 }
 
