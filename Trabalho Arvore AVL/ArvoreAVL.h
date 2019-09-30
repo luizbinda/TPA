@@ -4,7 +4,7 @@ typedef struct Nodo {
     dadosBancarios* cliente;
     struct Nodo* esquerda;
     struct Nodo* direita;
-    int nivel, altura;
+    int nivel, altura, fator_balanceamento;
     // Hashing parametros
     int exluido_hash;
     struct Nodo* prox;
@@ -26,6 +26,10 @@ Nodo* buscarValor(Nodo* nodo, int valor_procurado);
 Nodo* carregarArquivos(Nodo* nodo, Hashing* hash);
 int calcularAltura(Nodo* nodo);
 void calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual);
+Nodo* rotacaoParaDireita(Nodo* nodo);
+Nodo* rotacaoParaEsquerda(Nodo* nodo);
+
+//Hashing
 Hashing* iniciarHash();
 Hashing* iniciarVetorHash(Hashing* hash, int tamanho_hash);
 int calcularHashPos(Hashing* raiz, int valor, int total);
@@ -43,6 +47,7 @@ Nodo* criarNodo(dadosBancarios* cliente){
 	novo->esquerda = NULL;
     novo->nivel = 0;
     novo->altura = 0;
+    novo->fator_balanceamento = 0; 
     // Hashing parametros
     novo->prox = NULL;
     novo->exluido_hash = 0;
@@ -162,6 +167,50 @@ void calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual){
         calcularNivel(nodo->direita, valor_procurado, ++nivel_atual);
     }
 }
+
+Nodo* rotacaoParaDireita(Nodo* nodo) {
+    // Fazendo a movimentação necessária
+    Nodo* nodo_esquerda = nodo->esquerda;
+    nodo->esquerda = nodo_esquerda->direita;
+    nodo_esquerda->direita = nodo;
+
+    // Caso o nodo for a raiz global, atualiza-se o valor da raiz global
+    if (nodo == raiz)
+        raiz = nodo_esquerda;
+
+    // Atualizando os fatores de balanceamento
+    nodo_esquerda->fb = calcularAltura(nodo_esquerda->direita) - calcularAltura(nodo_esquerda->esquerda);
+    nodo->fb = calcularAltura(nodo->direita) - calcularAltura(nodo->esquerda);
+
+    return nodo_esquerda;
+}
+
+Nodo* rotacaoParaEsquerda(Nodo* nodo) {
+    // Fazendo a movimentação necessária
+    Nodo* nodo_direita = nodo->esquerda;
+    nodo->esquerda = nodo_direita->esquerda;
+    nodo_direita->esquerda = nodo;
+
+    // Caso o nodo for a raiz global, atualiza-se o valor da raiz global
+    if (nodo == raiz)
+        raiz = nodo_direita;
+
+    // Atualizando os fatores de balanceamento
+    nodo_direita->fb = calcularAltura(nodo_direita->direita) - calcularAltura(nodo_direita->esquerda);
+    nodo->fb = calcularAltura(nodo->direita) - calcularAltura(nodo->esquerda);
+
+    return nodo_direita;
+}
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Hashing* iniciarHash(){
     Hashing* hash = (Hashing*) malloc(sizeof(Hashing*));
