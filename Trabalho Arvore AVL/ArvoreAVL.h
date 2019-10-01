@@ -99,12 +99,14 @@ Nodo* removerNodo(Nodo** nodo, int valor_exluido){
         }            
         else if((*nodo)->esquerda == NULL){
             Nodo* temporario = (*nodo);
+
             (*nodo)->direita->pai = (*nodo)->pai;
             (*nodo) = (*nodo)->direita;
             free(temporario);
         }
         else if((*nodo)->direita == NULL){
-            Nodo* temporario = (*nodo);
+            Nodo* temporario = (*nodo);    
+
             (*nodo)->esquerda->pai = (*nodo)->pai;
             (*nodo) = (*nodo)->esquerda;
             free(temporario);
@@ -120,7 +122,7 @@ Nodo* removerNodo(Nodo** nodo, int valor_exluido){
             
             (*nodo)->esquerda = removerNodo(&(*nodo)->esquerda, valor_exluido);
         }
-    }
+    }    
     return (*nodo);
 }
 
