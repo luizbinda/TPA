@@ -34,7 +34,6 @@ int main(){
 				system("cls");
 				novo->id = valor;
 				raiz = inserirNodo(raiz, novo);
-				hash = inserirHash(hash, buscarValor(raiz, novo->id), calcularHashPosDivisao(novo->id,TAMVET));
 				
 				system("pause");
 				system("cls");
@@ -45,9 +44,7 @@ int main(){
 				printf("Digite o numero que deseja Excluir: ");
 				scanf("%d", &valor);
 				system("cls");
-				hash = excluirHash(hash, valor);
-				removerNodo(&raiz, valor);
-				
+				removerNodo(&raiz, valor);				
 				system("pause");
 				system("cls");
 				break;			

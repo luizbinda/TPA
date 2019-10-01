@@ -25,20 +25,15 @@ int calcularAltura(Nodo* nodo);
 void calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual);
 int calcularTotalNodos(Nodo* nodo);
 int estritamenteBinaria(Nodo* nodo);
-<<<<<<< HEAD
 int completa(Nodo* nodo);
 int estritamenteBinariaCompleta(Nodo* nodo);
-=======
 /////////////////////// Hash
->>>>>>> 2fa937587a219edbecde3c76c2c11c7a0f7af2ec
 Hashing* iniciarHash();
 Hashing* iniciarVetorHash(Hashing* hash, int tamanho_hash);
 int calcularHashPos(Hashing* raiz, int valor, int total);
 int calcularHashPosDivisao(int valor, int total);
-Hashing* inserirHash(Hashing* hash, Nodo* dados, int pos);
+Hashing* inserirHash(Hashing* hash, dadosBancarios* dados, int pos);
 Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos);
-Hashing* excluirHash(Hashing* hash, int id_exluido);
-void listarHashFechada(Hashing* hash, int tamanho_hash);
 Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida);
 int verificarEspelhamento(Nodo* nodo, Hashing* arvore_invertida, int pos);
 
@@ -122,9 +117,9 @@ Nodo* buscarValor(Nodo* nodo, int valor_procurado){
     else if(nodo->cliente->id == valor_procurado)
         return nodo;
     else if(nodo->cliente->id > valor_procurado)
-        buscarValor(nodo->esquerda, valor_procurado);
+        return buscarValor(nodo->esquerda, valor_procurado);
     else
-        buscarValor(nodo->direita, valor_procurado);
+        return buscarValor(nodo->direita, valor_procurado);
 }
 
 Nodo* carregarArquivos(Nodo* raiz, Hashing* hash){
@@ -136,7 +131,7 @@ Nodo* carregarArquivos(Nodo* raiz, Hashing* hash){
         dadosBancarios* novo = iniciarlista();
         preencherDados(conteudo, novo);   
         raiz = inserirNodo(raiz, novo);
-        hash = inserirHash(hash, buscarValor(raiz, novo->id), calcularHashPosDivisao(novo->id,50));
+        hash = inserirHash(hash, novo, calcularHashPosDivisao(novo->id,TAMVET));
     }
     
     return raiz;
@@ -238,59 +233,19 @@ int calcularHashPosDivisao(int valor, int total){
     return valor % total;
 }
 
-Hashing* inserirHash(Hashing* hash, Nodo* dados, int pos){
-
-    if (hash->vetor[pos] == NULL)
-        hash->vetor[pos] = dados;
-
-    else{
-        Nodo* aux = hash->vetor[pos];
-        aux = inserirNodo( aux, aux->cliente);
-    }
+Hashing* inserirHash(Hashing* hash, dadosBancarios* dados, int pos){
+    hash->vetor[pos] = inserirNodo(hash->vetor[pos], dados);
     return hash;
 }
 
 Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos){
     if (hash->vetor[pos] == NULL)
         return NULL;
-    else if (hash->vetor[pos]->exluido_hash == 1)
-        return hash->vetor[pos];
     else{
-        Nodo* aux = buscarValor(raiz, valor);
-        return aux;
-        }
+        Nodo* aux = buscarValor(hash->vetor[pos], pesquisado);
+        return aux;  
     }
     return NULL;
-}
-
-Hashing* excluirHash(Hashing* hash, int id_exluido){
-    Nodo* aux = pesquisarHash(hash, id_exluido, calcularHashPosDivisao(id_exluido, TAMVET));
-    
-    if (aux == NULL)
-        printf("O id que deseja excluir nao existe...\n");	
-                    
-    else if ( aux->exluido_hash == 1)
-        printf("O id pesquisado ja foi excluido!\n");
-
-    else{
-        aux->exluido_hash = 1;
-    }
-
-    return hash;
-}
-
-void listarHashFechada(Hashing* hash, int tamanho_hash){
-    int i;
-    Nodo* aux; 
-    for (i = 0; i < tamanho_hash; i++){
-        aux = hash->vetor[i];
-        while (aux != NULL) {
-           if(aux->exluido_hash == 0)
-                printf("\tpos[%d] - id: %i\n", i, aux->cliente->id);
-            
-            aux = aux->prox;
-        }   
-    }
 }
 
 Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida){
@@ -300,8 +255,7 @@ Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida){
     while(fgets(conteudo, BUFSIZ, ponteiro_arquivo) != NULL){
         dadosBancarios* novo = iniciarlista();
         preencherDados(conteudo, novo);
-        Nodo* novo_nodo = criarNodo(novo);
-        arvore_invertida = inserirHash(arvore_invertida, novo_nodo, calcularHashPos(arvore_invertida, novo->id, 0));
+        arvore_invertida = inserirHash(arvore_invertida, novo, calcularHashPos(arvore_invertida, novo->id, 0));
     }
     return arvore_invertida;
 }
