@@ -179,8 +179,8 @@ Nodo* rotacaoParaDireita(Nodo* nodo) {
         raiz = nodo_esquerda;
 
     // Atualizando os fatores de balanceamento
-    nodo_esquerda->fb = calcularAltura(nodo_esquerda->direita) - calcularAltura(nodo_esquerda->esquerda);
-    nodo->fb = calcularAltura(nodo->direita) - calcularAltura(nodo->esquerda);
+    nodo_esquerda->fator_balanceamento = calcularAltura(nodo_esquerda->direita) - calcularAltura(nodo_esquerda->esquerda);
+    nodo->fator_balanceamento = calcularAltura(nodo->direita) - calcularAltura(nodo->esquerda);
 
     return nodo_esquerda;
 }
@@ -196,8 +196,8 @@ Nodo* rotacaoParaEsquerda(Nodo* nodo) {
         raiz = nodo_direita;
 
     // Atualizando os fatores de balanceamento
-    nodo_direita->fb = calcularAltura(nodo_direita->direita) - calcularAltura(nodo_direita->esquerda);
-    nodo->fb = calcularAltura(nodo->direita) - calcularAltura(nodo->esquerda);
+    nodo_direita->fator_balanceamento = calcularAltura(nodo_direita->direita) - calcularAltura(nodo_direita->esquerda);
+    nodo->fator_balanceamento = calcularAltura(nodo->direita) - calcularAltura(nodo->esquerda);
 
     return nodo_direita;
 }
@@ -245,74 +245,6 @@ int calcularHashPosDivisao(int valor, int total){
     return valor % total;
 }
 
-Hashing* inserirHash(Hashing* hash, Nodo* dados, int pos){
-
-    if (hash->vetor[pos] == NULL)
-        hash->vetor[pos] = dados;
-    else if (hash->vetor[pos]->exluido_hash == 1){
-        dados->prox = hash->vetor[pos]->prox;
-        hash->vetor[pos] = dados;
-    }        
-    else{
-        Nodo* aux = hash->vetor[pos];
-        while (aux->prox != NULL ){
-            if (aux->prox->exluido_hash == 1)
-                break;            
-            aux = aux->prox;
-        }
-        if (aux->prox != NULL)
-            dados->prox = aux->prox->prox;
-                           
-        aux->prox = dados;
-    }
-    return hash;
-}
-
-Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos){
-    if (hash->vetor[pos] == NULL)
-        return NULL;
-    else if (hash->vetor[pos]->exluido_hash == 1)
-        return hash->vetor[pos];
-    else{
-        Nodo* aux = hash->vetor[pos];
-        while (aux != NULL ){
-            if (aux->cliente->id == pesquisado)
-                return aux;           
-            aux = aux->prox;
-        }
-    }
-    return NULL;
-}
-
-Hashing* excluirHash(Hashing* hash, int id_exluido){
-    Nodo* aux = pesquisarHash(hash, id_exluido, calcularHashPosDivisao(id_exluido, TAMVET));
-    
-    if (aux == NULL)
-        printf("O id que deseja excluir nao existe...\n");	
-                    
-    else if ( aux->exluido_hash == 1)
-        printf("O id pesquisado ja foi excluido!\n");
-
-    else{
-        aux->exluido_hash = 1;
-    }
-
-    return hash;
-}
-
-void listarHashFechada(Hashing* hash, int tamanho_hash){
-    int i;
-    Nodo* aux; 
-    for (i = 0; i < tamanho_hash; i++){
-        aux = hash->vetor[i];
-        while (aux != NULL) {
-           if(aux->exluido_hash == 0)
-                printf("\tpos[%d] - id: %i\n", i, aux->cliente->id);
-            
-            aux = aux->prox;
-        }   
-    }
-}
 
 Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida){
     FILE* ponteiro_arquivo;
