@@ -7,8 +7,6 @@
 
 int main(){
    	raiz = NULL;
-	hash = iniciarHash();
-	hash = iniciarVetorHash(hash, TAMVET);
 	raiz = carregarArquivos(raiz, hash);
 
 	int op = -1;
@@ -34,7 +32,6 @@ int main(){
 				system("cls");
 				novo->id = valor;
 				raiz = inserirNodo(raiz, novo);
-				hash = inserirHash(hash, buscarValor(raiz, novo->id), calcularHashPosDivisao(novo->id,TAMVET));
 				
 				system("pause");
 				system("cls");
@@ -45,7 +42,6 @@ int main(){
 				printf("Digite o numero que deseja Excluir: ");
 				scanf("%d", &valor);
 				system("cls");
-				hash = excluirHash(hash, valor);
 				removerNodo(&raiz, valor);
 				
 				system("pause");
@@ -59,27 +55,11 @@ int main(){
 				scanf("%d", &valor);
 				system("cls");
 				
-				// contando tempo pela busca na arvore
-				double inicio_buscar_arvore = (double)clock();
 				Nodo* aux = buscarValor(raiz, valor);
-				double fim_buscar_arvore = (double)clock();
-				double total_tempo_arvore = (double) (inicio_buscar_arvore - fim_buscar_arvore) / CLOCKS_PER_SEC;
-				
+			
 				// Verificando se enconrou o numero pesquisado
-				if(aux != NULL){
-					printf("Arvore tempo: %lf --Id: %d  Saldo: %f  Nome: %s\n", total_tempo_arvore, aux->cliente->id, aux->cliente->saldo, aux->cliente->nome);
-
-					// contando tempo e buscando valor na hash
-					double inicio_buscar_hash = (double)clock();
-					aux = pesquisarHash(hash, valor, calcularHashPosDivisao(valor, TAMVET));
-					double fim_buscar_hash = (double)clock();
-					double total_tempo_hash = (double) (inicio_buscar_hash - fim_buscar_hash) / CLOCKS_PER_SEC;
-					printf("Hash tempo : %lf -- Id: %d  Saldo: %f  Nome: %s\n", total_tempo_hash, aux->cliente->id, aux->cliente->saldo, aux->cliente->nome);
-					printf("tempo ini Arvore %lf -- tempo fim Hash %lf \n", inicio_buscar_arvore, fim_buscar_arvore);
-					printf("tempo ini Hash %lf -- tempo fim Arvore %lf \n", inicio_buscar_hash, fim_buscar_hash);
-					printf("difrenca entre tempos: %lf \n",total_tempo_arvore - total_tempo_hash);
-				
-				}
+				if(aux != NULL)
+					printf("Id: %d  Saldo: %f  Nome: %s\n", aux->cliente->id, aux->cliente->saldo, aux->cliente->nome);
 				else
 					printf("Nodo não encontrado\n");
 				
@@ -94,14 +74,6 @@ int main(){
 				system("cls");
 				
 				percorrerArvoreEmOrdemDecrescente(raiz);
-				system("pause");
-				system("cls");
-				break;
-			}
-			case 5:{
-				system("cls");
-				printf("total de Nodos: %d\n", calcularTotalNodos(raiz));	
-
 				system("pause");
 				system("cls");
 				break;
@@ -131,38 +103,7 @@ int main(){
 				system("cls");
 				break;
 			}
-			case 8:{
-				system("cls");
-				if(estritamenteBinaria(raiz) == 1 && estritamenteBinariaCompleta(raiz) == 1 )
-					printf("Estritamente Binaria e Completa\n");
-				else if(estritamenteBinaria(raiz) == 1 && estritamenteBinariaCompleta(raiz) == 0)
-					printf("Estritamente Binaria e incompleta\n");
-				else
-					printf("Nao eh Estritamente Binaria\n");
 
-				system("pause");
-				system("cls");
-				break;
-			}
-			case 9:{
-				system("cls");
-				Hashing* arvore_invertida;
-				arvore_invertida = iniciarHash();
-				arvore_invertida = iniciarVetorHash(arvore_invertida, TAMVET);
-				arvore_invertida = carregarArvoreInvertida(raiz, arvore_invertida);
-
-				if (verificarEspelhamento(raiz, arvore_invertida, 0) == 1)
-					printf("Arvore espelhada!\n");
-				else
-					printf("Arvore Nao espelhada!\n");
-				
-				free(arvore_invertida);
-				
-				system("pause");
-				system("cls");
-
-				break;
-			}
 		}
 	}
 	return 0;

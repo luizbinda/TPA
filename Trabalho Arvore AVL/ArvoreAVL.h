@@ -4,6 +4,7 @@ typedef struct Nodo {
     dadosBancarios* cliente;
     struct Nodo* esquerda;
     struct Nodo* direita;
+    struct Nodo* pai;
     int nivel, altura, fator_balanceamento;
     // Hashing parametros
     int exluido_hash;
@@ -28,6 +29,7 @@ int calcularAltura(Nodo* nodo);
 void calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual);
 Nodo* rotacaoParaDireita(Nodo* nodo);
 Nodo* rotacaoParaEsquerda(Nodo* nodo);
+Nodo* balancearArvore(Nodo *nodo);
 
 //Hashing
 Hashing* iniciarHash();
@@ -45,6 +47,7 @@ Nodo* criarNodo(dadosBancarios* cliente){
 	novo->cliente = cliente;
 	novo->direita = NULL;
 	novo->esquerda = NULL;
+	novo->pai = NULL;
     novo->nivel = 0;
     novo->altura = 0;
     novo->fator_balanceamento = 0; 
@@ -55,12 +58,29 @@ Nodo* criarNodo(dadosBancarios* cliente){
 }
 
 Nodo* inserirNodo(Nodo* nodo, dadosBancarios* cliente){
-    if(nodo == NULL)
+    if(nodo == NULL){
+
         nodo = criarNodo(cliente);
-    else if ( cliente->id < nodo->cliente->id)
+        Nodo* aux = nodo;
+        // Percorrendo a árvore para cima a partir do novo elemento inserido
+        while (aux != NULL) {
+            aux->fator_balanceamento = calcularAltura(aux->direita) - calcularAltura(aux->esquerda);
+            
+            if (aux->fator_balanceamento > 1 || aux->fator_balanceamento < -1)
+                aux = balancearArvore(aux);
+        
+            aux = aux->pai;
+        }
+        
+    }
+    else if ( cliente->id < nodo->cliente->id){
         nodo->esquerda = inserirNodo(nodo->esquerda, cliente);
-    else 
+        nodo->esquerda->pai = nodo;
+    }
+    else {
         nodo->direita = inserirNodo(nodo->direita, cliente);
+        nodo->direita->pai = nodo;
+    }
 
     return nodo;
 }
@@ -74,18 +94,20 @@ Nodo* removerNodo(Nodo** nodo, int valor_exluido){
         (*nodo)->direita = removerNodo(&(*nodo)->direita, valor_exluido);
     else {
         if((*nodo)->direita == NULL && (*nodo)->esquerda == NULL){
-            //free((*nodo));
+            free((*nodo));
             (*nodo) = NULL;
         }            
         else if((*nodo)->esquerda == NULL){
-            //Nodo* temporario = (*nodo);
+            Nodo* temporario = (*nodo);
+            (*nodo)->direita->pai = (*nodo)->pai;
             (*nodo) = (*nodo)->direita;
-            //free(temporario);
+            free(temporario);
         }
         else if((*nodo)->direita == NULL){
-           // Nodo* temporario = (*nodo);
+            Nodo* temporario = (*nodo);
+            (*nodo)->esquerda->pai = (*nodo)->pai;
             (*nodo) = (*nodo)->esquerda;
-            //free(temporario);
+            free(temporario);
         }
         else{
             Nodo* temporario = (*nodo)->esquerda;
@@ -138,7 +160,7 @@ Nodo* carregarArquivos(Nodo* raiz, Hashing* hash){
         dadosBancarios* novo = iniciarlista();
         preencherDados(conteudo, novo);   
         raiz = inserirNodo(raiz, novo);
-        hash = inserirHash(hash, buscarValor(raiz, novo->id), calcularHashPosDivisao(novo->id,50));
+        //hash = inserirHash(hash, buscarValor(raiz, novo->id), calcularHashPosDivisao(novo->id,50));
     }
     
     return raiz;
@@ -203,6 +225,26 @@ Nodo* rotacaoParaEsquerda(Nodo* nodo) {
 }
 
 
+Nodo* balancearArvore(Nodo *nodo) {
+    // Desbalanceada para a esquerda
+    if (nodo->fator_balanceamento < -1) {
+        // Caso o nó à esquerda tenha somente filho à direita
+        if(nodo->esquerda->fator_balanceamento > 0)
+            nodo->esquerda = rotacaoParaEsquerda(nodo->esquerda);
+
+        nodo = rotacaoParaDireita(nodo);
+    }
+    // Desbalanceada para a direta
+    else if (nodo->fator_balanceamento > 1) {
+        // Caso o nó à direita tenha somente filho à esquerda
+        if (nodo->direita->fator_balanceamento < 0)
+            nodo->direita = rotacaoParaDireita(nodo->direita);
+
+        nodo = rotacaoParaEsquerda(nodo);
+    }
+
+    return nodo;
+}
 
 
 
@@ -254,7 +296,7 @@ Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida){
         dadosBancarios* novo = iniciarlista();
         preencherDados(conteudo, novo);
         Nodo* novo_nodo = criarNodo(novo);
-        arvore_invertida = inserirHash(arvore_invertida, novo_nodo, calcularHashPos(arvore_invertida, novo->id, 0));
+        //arvore_invertida = inserirHash(arvore_invertida, novo_nodo, calcularHashPos(arvore_invertida, novo->id, 0));
     }
     return arvore_invertida;
 }
