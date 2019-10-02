@@ -8,6 +8,7 @@
 int main(){
    	raiz = NULL;
 	raiz = carregarArquivos(raiz, hash);
+	raiz = verificarBalanceamento(raiz);
 
 	int op = -1;
 	int valor;
@@ -43,7 +44,7 @@ int main(){
 				scanf("%d", &valor);
 				system("cls");
 				removerNodo(&raiz, valor);
-				
+				raiz = verificarBalanceamento(raiz);
 				system("pause");
 				system("cls");
 				break;			
@@ -80,8 +81,8 @@ int main(){
 			}
 			case 6:{
 				system("cls");
-				printf("Altura: %d\n", calcularAltura(raiz));
-
+				//printf("Altura: %d\n", calcularAltura(raiz));
+				exibir_niveis(raiz, raiz)
 				system("pause");
 				system("cls");
 				break;

@@ -59,19 +59,8 @@ Nodo* criarNodo(dadosBancarios* cliente){
 
 Nodo* inserirNodo(Nodo* nodo, dadosBancarios* cliente){
     if(nodo == NULL){
-
         nodo = criarNodo(cliente);
         Nodo* aux = nodo;
-        // Percorrendo a árvore para cima a partir do novo elemento inserido
-        while (aux != NULL) {
-            aux->fator_balanceamento = calcularAltura(aux->direita) - calcularAltura(aux->esquerda);
-            
-            if (aux->fator_balanceamento > 1 || aux->fator_balanceamento < -1)
-                aux = balancearArvore(aux);
-        
-            aux = aux->pai;
-        }
-        
     }
     else if ( cliente->id < nodo->cliente->id){
         nodo->esquerda = inserirNodo(nodo->esquerda, cliente);
@@ -83,6 +72,20 @@ Nodo* inserirNodo(Nodo* nodo, dadosBancarios* cliente){
     }
 
     return nodo;
+}
+
+Nodo* verificarBalanceamento(Nodo* raiz){
+    if(raiz != NULL){
+        percorrerArvoreEmOrdemCrescente(raiz->esquerda);
+        raiz->fator_balanceamento = calcularAltura(raiz->direita) - calcularAltura(raiz->esquerda);
+        
+        if (raiz->fator_balanceamento > 1 || raiz->fator_balanceamento < -1)
+            raiz = balancearArvore(raiz);
+
+        percorrerArvoreEmOrdemCrescente(raiz->direita);    
+    }
+
+    return raiz;
 }
 
 Nodo* removerNodo(Nodo** nodo, int valor_exluido){
@@ -248,7 +251,32 @@ Nodo* balancearArvore(Nodo *nodo) {
     return nodo;
 }
 
+void exibir_niveis(Nodo* nodo,Nodo* raiz) {
+    for (int i = 0; i <= calcularAltura(nodo); ++i) {
+        printf("Nivel %d\n", i);
+        exibir_niveis_b(nodo, raiz, i, 0);
+        printf("\n\n");
+    }
+}
 
+// Exibindo nível específico
+void exibir_niveis_b(Nodo* aux,Nodo* raiz, int atual, int cont) {
+    // Verificando se raiz global não é nula
+    if (!raiz) {
+        printf("A arvore esta vazia!");
+        getchar();
+        return;
+    }
+
+    if (aux) {
+        exibir_niveis_b(aux->esquerda, atual, cont+1);
+
+        if (atual == cont)
+            printf("%d ", aux->n);
+
+        exibir_niveis_b(aux->direita, atual, cont+1);
+    }
+}
 
 
 
@@ -289,7 +317,6 @@ int calcularHashPosDivisao(int valor, int total){
     return valor % total;
 }
 
-
 Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida){
     FILE* ponteiro_arquivo;
     ponteiro_arquivo = fopen("DadosBancoPulini2.txt", "r");
@@ -302,4 +329,3 @@ Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida){
     }
     return arvore_invertida;
 }
-
