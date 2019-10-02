@@ -82,7 +82,7 @@ int main(){
 			case 6:{
 				system("cls");
 				//printf("Altura: %d\n", calcularAltura(raiz));
-				exibir_niveis(raiz, raiz)
+				exibirTotalNiveis(raiz);
 				system("pause");
 				system("cls");
 				break;

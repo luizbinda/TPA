@@ -20,6 +20,7 @@ Hashing* hash;
 
 Nodo* criarNodo(dadosBancarios* cliente);
 Nodo* inserirNodo(Nodo* nodo, dadosBancarios* cliente);
+Nodo* verificarBalanceamento(Nodo* raiz);
 Nodo* removerNodo(Nodo** nodo, int valor_exluido);
 void percorrerArvoreEmOrdemCrescente(Nodo* nodo);
 void percorrerArvoreEmOrdemDecrescente(Nodo* nodo);
@@ -30,6 +31,8 @@ void calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual);
 Nodo* rotacaoParaDireita(Nodo* nodo);
 Nodo* rotacaoParaEsquerda(Nodo* nodo);
 Nodo* balancearArvore(Nodo *nodo);
+void exibirTotalNiveis(Nodo* nodo);
+void exibirNiveis(Nodo* aux, int atual, int cont);
 
 //Hashing
 Hashing* iniciarHash();
@@ -76,15 +79,13 @@ Nodo* inserirNodo(Nodo* nodo, dadosBancarios* cliente){
 
 Nodo* verificarBalanceamento(Nodo* raiz){
     if(raiz != NULL){
-        percorrerArvoreEmOrdemCrescente(raiz->esquerda);
+        verificarBalanceamento(raiz->esquerda);
         raiz->fator_balanceamento = calcularAltura(raiz->direita) - calcularAltura(raiz->esquerda);
         
         if (raiz->fator_balanceamento > 1 || raiz->fator_balanceamento < -1)
             raiz = balancearArvore(raiz);
-
-        percorrerArvoreEmOrdemCrescente(raiz->direita);    
+        verificarBalanceamento(raiz->direita);    
     }
-
     return raiz;
 }
 
@@ -251,16 +252,17 @@ Nodo* balancearArvore(Nodo *nodo) {
     return nodo;
 }
 
-void exibir_niveis(Nodo* nodo,Nodo* raiz) {
-    for (int i = 0; i <= calcularAltura(nodo); ++i) {
+void exibirTotalNiveis(Nodo* nodo) {
+    int i;
+	for (i = 0; i <= calcularAltura(nodo); ++i) {
         printf("Nivel %d\n", i);
-        exibir_niveis_b(nodo, raiz, i, 0);
+        exibirNiveis(nodo, i, 0);
         printf("\n\n");
     }
 }
 
 // Exibindo nível específico
-void exibir_niveis_b(Nodo* aux,Nodo* raiz, int atual, int cont) {
+void exibirNiveis(Nodo* aux, int atual, int cont) {
     // Verificando se raiz global não é nula
     if (!raiz) {
         printf("A arvore esta vazia!");
@@ -269,16 +271,14 @@ void exibir_niveis_b(Nodo* aux,Nodo* raiz, int atual, int cont) {
     }
 
     if (aux) {
-        exibir_niveis_b(aux->esquerda, atual, cont+1);
+        exibirNiveis(aux->esquerda, atual, cont+1);
 
         if (atual == cont)
-            printf("%d ", aux->n);
+            printf("%d ", aux->cliente->id);
 
-        exibir_niveis_b(aux->direita, atual, cont+1);
+        exibirNiveis(aux->direita, atual, cont+1);
     }
 }
-
-
 
 
 
