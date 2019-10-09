@@ -13,7 +13,7 @@ int getNum(){
 }
 
 int main(){
-   	raiz = NULL; 
+   	raiz = NULL;
 
 	int op = -1;
 	int valor;
@@ -35,6 +35,7 @@ int main(){
 				system("cls");
 				novo->id = getNum();
 				raiz = inserirNodo(raiz, novo);
+				//raiz = percorrerArvoreBalanceando(raiz);
 				system("pause");
 				system("cls");
 				break;
@@ -61,27 +62,19 @@ int main(){
 			}
 			case 4:{
 				system("cls");
-				raiz = carregarArquivos(raiz, hash);
+				raiz = carregarArquivos(raiz);
 				system("pause");
 				system("cls");
 				break;
 			}
 			case 5:{
 				system("cls");
-				removerNodo(&raiz, getNum());
 				system("pause");
 				system("cls");
 				break;			
 			}
 			case 6:{
-				// pegando valor a ser procurado
 				system("cls");				
-				Nodo* aux = buscarValor(raiz, getNum());
-				// Verificando se enconrou o numero pesquisado
-				if(aux != NULL)
-					printf("Id: %d  Saldo: %f  Nome: %s\n", aux->cliente->id, aux->cliente->saldo, aux->cliente->nome);
-				else
-					printf("Nodo não encontrado\n");
 				
 				system("pause");
 				system("cls");
@@ -89,7 +82,6 @@ int main(){
 			}
 			case 7:{
 				system("cls");
-				printf("Altura: %d\n", calcularAltura(raiz));
 
 				system("pause");
 				system("cls");
@@ -97,16 +89,6 @@ int main(){
 			}
 			case 8:{
 				system("cls");
-				printf("Digite o numero que deseja Buscar: ");
-				scanf("%d", &valor);
-				system("cls");
-				Nodo* aux = buscarValor(raiz, valor);
-				if(aux != NULL){
-					calcularNivel(raiz, valor, 0);			
-					printf("Nivel: %d\n", aux->nivel);
-				}
-				else
-					printf("Nodo não encontrado\n");
 
 				system("pause");
 				system("cls");
@@ -115,10 +97,8 @@ int main(){
 			case 9:{
 				system("cls");
 				percorrerArvoreEmOrdemCrescente(raiz);
-				system("pause");
-				system("cls");
+				printf("altura: %d\n", calcularAltura(raiz)); 
 				
-				percorrerArvoreEmOrdemDecrescente(raiz);
 				system("pause");
 				system("cls");
 				break;

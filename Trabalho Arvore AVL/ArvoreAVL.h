@@ -6,9 +6,7 @@ typedef struct Nodo {
     struct Nodo* direita;
     struct Nodo* pai;
     int nivel, altura, fator_balanceamento;
-    // Hashing parametros
-    int exluido_hash;
-    struct Nodo* prox;
+
 }Nodo;
 
 typedef struct Hashing {
@@ -24,7 +22,7 @@ Nodo* removerNodo(Nodo** nodo, int valor_exluido);
 void percorrerArvoreEmOrdemCrescente(Nodo* nodo);
 void percorrerArvoreEmOrdemDecrescente(Nodo* nodo);
 Nodo* buscarValor(Nodo* nodo, int valor_procurado);
-Nodo* carregarArquivos(Nodo* nodo, Hashing* hash);
+Nodo* carregarArquivos(Nodo* nodo);
 int calcularAltura(Nodo* nodo);
 void calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual);
 Nodo* rotacaoParaDireita(Nodo* nodo);
@@ -36,7 +34,7 @@ Hashing* iniciarHash();
 Hashing* iniciarVetorHash(Hashing* hash, int tamanho_hash);
 int calcularHashPos(Hashing* raiz, int valor, int total);
 int calcularHashPosDivisao(int valor, int total);
-Hashing* inserirHash(Hashing* hash, Nodo* dados, int pos);
+Hashing* inserirHash(Hashing* hash, dadosBancarios* dados, int pos);
 Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos);
 Hashing* excluirHash(Hashing* hash, int id_exluido);
 void listarHashFechada(Hashing* hash, int tamanho_hash);
@@ -51,9 +49,6 @@ Nodo* criarNodo(dadosBancarios* cliente){
     novo->nivel = 0;
     novo->altura = 0;
     novo->fator_balanceamento = 0; 
-    // Hashing parametros
-    novo->prox = NULL;
-    novo->exluido_hash = 0;
 	return novo;
 }
 
@@ -134,14 +129,6 @@ void percorrerArvoreEmOrdemCrescente(Nodo* nodo){
     }
 }
 
-void percorrerArvoreEmOrdemDecrescente(Nodo* nodo){
-    if(nodo != NULL){
-        percorrerArvoreEmOrdemDecrescente(nodo->direita);
-        printf("\t-%d-\n", nodo->cliente->id);
-        percorrerArvoreEmOrdemDecrescente(nodo->esquerda);    
-    }
-}
-
 Nodo* buscarValor(Nodo* nodo, int valor_procurado){
     if(nodo == NULL)
         return NULL;
@@ -153,7 +140,7 @@ Nodo* buscarValor(Nodo* nodo, int valor_procurado){
         buscarValor(nodo->direita, valor_procurado);
 }
 
-Nodo* carregarArquivos(Nodo* raiz, Hashing* hash){
+Nodo* carregarArquivos(Nodo* raiz){
     FILE* ponteiro_arquivo;
     ponteiro_arquivo = fopen("DadosBancoPulini.txt", "r");
 
@@ -162,6 +149,10 @@ Nodo* carregarArquivos(Nodo* raiz, Hashing* hash){
         dadosBancarios* novo = iniciarlista();
         preencherDados(conteudo, novo);   
         raiz = inserirNodo(raiz, novo);
+        percorrerArvoreEmOrdemCrescente(raiz);
+		printf("altura: %d\n", calcularAltura(raiz)); 
+        system("pause");
+		system("cls");
         //hash = inserirHash(hash, buscarValor(raiz, novo->id), calcularHashPosDivisao(novo->id,50));
     }
     
@@ -247,10 +238,23 @@ Nodo* balancearArvore(Nodo *nodo) {
     return nodo;
 }
 
+void percorrerArvoreCalculandoAltura(Nodo* nodo){
+    if(nodo != NULL){
+        percorrerArvoreCalculandoAltura(nodo->esquerda);
+        percorrerArvoreCalculandoAltura(nodo->direita); 
+        nodo->fator_balanceamento = calcularAltura(nodo->direita) - calcularAltura(nodo->esquerda);   
+    }
+}
 
-
-
-
+Nodo* percorrerArvoreBalanceando(Nodo* nodo){
+    if(nodo != NULL){
+        percorrerArvoreBalanceando(nodo->esquerda);
+        percorrerArvoreBalanceando(nodo->direita); 
+        if (nodo->fator_balanceamento > 1 || nodo->fator_balanceamento < -1)
+        nodo = balancearArvore(nodo);    
+    }
+    return nodo;
+}
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -296,7 +300,7 @@ Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida){
         dadosBancarios* novo = iniciarlista();
         preencherDados(conteudo, novo);
         Nodo* novo_nodo = criarNodo(novo);
-        arvore_invertida = inserirHash(arvore_invertida, novo_nodo, calcularHashPos(arvore_invertida, novo->id, 0));
+        //arvore_invertida = inserirHash(arvore_invertida, novo_nodo, calcularHashPos(arvore_invertida, novo->id, 0));
     }
     return arvore_invertida;
 }
