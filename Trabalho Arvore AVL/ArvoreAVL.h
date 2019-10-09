@@ -28,6 +28,7 @@ void calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual);
 Nodo* rotacaoParaDireita(Nodo* nodo);
 Nodo* rotacaoParaEsquerda(Nodo* nodo);
 Nodo* balancearArvore(Nodo *nodo);
+Nodo* percorrerArvoreBalanceando(Nodo* nodo);
 
 //Hashing
 Hashing* iniciarHash();
@@ -53,19 +54,12 @@ Nodo* criarNodo(dadosBancarios* cliente){
 }
 
 Nodo* inserirNodo(Nodo* nodo, dadosBancarios* cliente){
+    Nodo* aux;
+
     if(nodo == NULL){
 
         nodo = criarNodo(cliente);
-        Nodo* aux = nodo;
-        // Percorrendo a árvore para cima a partir do novo elemento inserido
-        while (aux != NULL) {
-            aux->fator_balanceamento = calcularAltura(aux->direita) - calcularAltura(aux->esquerda);
-            
-            if (aux->fator_balanceamento > 1 || aux->fator_balanceamento < -1)
-                aux = balancearArvore(aux);
-        
-            aux = aux->pai;
-        }
+        aux = nodo;
         
     }
     else if ( cliente->id < nodo->cliente->id){
@@ -149,11 +143,10 @@ Nodo* carregarArquivos(Nodo* raiz){
         dadosBancarios* novo = iniciarlista();
         preencherDados(conteudo, novo);   
         raiz = inserirNodo(raiz, novo);
+        raiz = percorrerArvoreBalanceando(raiz);
         percorrerArvoreEmOrdemCrescente(raiz);
-		printf("altura: %d\n", calcularAltura(raiz)); 
+        printf("altura: %d\n", calcularAltura(raiz)); 
         system("pause");
-		system("cls");
-        //hash = inserirHash(hash, buscarValor(raiz, novo->id), calcularHashPosDivisao(novo->id,50));
     }
     
     return raiz;
@@ -189,9 +182,23 @@ Nodo* rotacaoParaDireita(Nodo* nodo) {
     nodo->esquerda = nodo_esquerda->direita;
     nodo_esquerda->direita = nodo;
 
-    // Caso o nodo for a raiz global, atualiza-se o valor da raiz global
+    // Acertando os pais
+    if (nodo->esquerda)
+        nodo->esquerda->pai = nodo;
+
+    nodo_esquerda->pai = nodo->pai;
+    nodo->pai = nodo_esquerda;
+
+    // Caso o aux for a raiz global, atualiza-se o valor da raiz global
     if (nodo == raiz)
         raiz = nodo_esquerda;
+
+     // Ligando os ponteiros do pai da nova raiz da sub-arvore corretamente
+    if (nodo_esquerda->pai)
+        if (nodo_esquerda->cliente->id < nodo_esquerda->pai->cliente->id)
+            nodo_esquerda->pai->esquerda = nodo_esquerda;
+        else
+            nodo_esquerda->pai->direita = nodo_esquerda;
 
     // Atualizando os fatores de balanceamento
     nodo_esquerda->fator_balanceamento = calcularAltura(nodo_esquerda->direita) - calcularAltura(nodo_esquerda->esquerda);
@@ -202,20 +209,33 @@ Nodo* rotacaoParaDireita(Nodo* nodo) {
 
 Nodo* rotacaoParaEsquerda(Nodo* nodo) {
     // Fazendo a movimentação necessária
-    Nodo* nodo_direita = nodo->esquerda;
-    nodo->esquerda = nodo_direita->esquerda;
+    Nodo* nodo_direita = nodo->direita;
+    nodo->direita = nodo_direita->esquerda;
     nodo_direita->esquerda = nodo;
 
-    // Caso o nodo for a raiz global, atualiza-se o valor da raiz global
+ // Acertando os pais
+    if (nodo->direita)
+        nodo->direita->pai = nodo;
+    nodo_direita->pai = nodo->pai;
+    nodo->pai = nodo_direita;
+
+    // Caso o aux for a raiz global, atualiza-se o valor da raiz global
     if (nodo == raiz)
         raiz = nodo_direita;
+
+    // Ligando os ponteiros do pai da nova raiz da sub-arvore corretamente
+    if (nodo_direita->pai)
+        if (nodo_direita->cliente->id < nodo_direita->pai->cliente->id)
+            nodo_direita->pai->esquerda = nodo_direita;
+        else
+            nodo_direita->pai->direita = nodo_direita;
 
     // Atualizando os fatores de balanceamento
     nodo_direita->fator_balanceamento = calcularAltura(nodo_direita->direita) - calcularAltura(nodo_direita->esquerda);
     nodo->fator_balanceamento = calcularAltura(nodo->direita) - calcularAltura(nodo->esquerda);
 
     return nodo_direita;
-}
+} 
 
 Nodo* balancearArvore(Nodo *nodo) {
     // Desbalanceada para a esquerda
@@ -224,7 +244,7 @@ Nodo* balancearArvore(Nodo *nodo) {
         if(nodo->esquerda->fator_balanceamento > 0)
             nodo->esquerda = rotacaoParaEsquerda(nodo->esquerda);
 
-        nodo = rotacaoParaDireita(nodo);
+        return rotacaoParaDireita(nodo);
     }
     // Desbalanceada para a direta
     else if (nodo->fator_balanceamento > 1) {
@@ -232,30 +252,24 @@ Nodo* balancearArvore(Nodo *nodo) {
         if (nodo->direita->fator_balanceamento < 0)
             nodo->direita = rotacaoParaDireita(nodo->direita);
 
-        nodo = rotacaoParaEsquerda(nodo);
+        return rotacaoParaEsquerda(nodo);
     }
 
     return nodo;
-}
-
-void percorrerArvoreCalculandoAltura(Nodo* nodo){
-    if(nodo != NULL){
-        percorrerArvoreCalculandoAltura(nodo->esquerda);
-        percorrerArvoreCalculandoAltura(nodo->direita); 
-        nodo->fator_balanceamento = calcularAltura(nodo->direita) - calcularAltura(nodo->esquerda);   
-    }
 }
 
 Nodo* percorrerArvoreBalanceando(Nodo* nodo){
     if(nodo != NULL){
         percorrerArvoreBalanceando(nodo->esquerda);
         percorrerArvoreBalanceando(nodo->direita); 
+        nodo->fator_balanceamento = calcularAltura(nodo->direita) - calcularAltura(nodo->esquerda); 
         if (nodo->fator_balanceamento > 1 || nodo->fator_balanceamento < -1)
         nodo = balancearArvore(nodo);    
     }
     return nodo;
 }
 
+ 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
