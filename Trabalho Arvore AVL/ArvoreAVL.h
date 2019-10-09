@@ -20,7 +20,6 @@ Hashing* hash;
 
 Nodo* criarNodo(dadosBancarios* cliente);
 Nodo* inserirNodo(Nodo* nodo, dadosBancarios* cliente);
-Nodo* verificarBalanceamento(Nodo* raiz);
 Nodo* removerNodo(Nodo** nodo, int valor_exluido);
 void percorrerArvoreEmOrdemCrescente(Nodo* nodo);
 void percorrerArvoreEmOrdemDecrescente(Nodo* nodo);
@@ -31,8 +30,6 @@ void calcularNivel(Nodo* nodo, int valor_procurado, int nivel_atual);
 Nodo* rotacaoParaDireita(Nodo* nodo);
 Nodo* rotacaoParaEsquerda(Nodo* nodo);
 Nodo* balancearArvore(Nodo *nodo);
-void exibirTotalNiveis(Nodo* nodo);
-void exibirNiveis(Nodo* aux, int atual, int cont);
 
 //Hashing
 Hashing* iniciarHash();
@@ -62,8 +59,19 @@ Nodo* criarNodo(dadosBancarios* cliente){
 
 Nodo* inserirNodo(Nodo* nodo, dadosBancarios* cliente){
     if(nodo == NULL){
+
         nodo = criarNodo(cliente);
         Nodo* aux = nodo;
+        // Percorrendo a árvore para cima a partir do novo elemento inserido
+        while (aux != NULL) {
+            aux->fator_balanceamento = calcularAltura(aux->direita) - calcularAltura(aux->esquerda);
+            
+            if (aux->fator_balanceamento > 1 || aux->fator_balanceamento < -1)
+                aux = balancearArvore(aux);
+        
+            aux = aux->pai;
+        }
+        
     }
     else if ( cliente->id < nodo->cliente->id){
         nodo->esquerda = inserirNodo(nodo->esquerda, cliente);
@@ -75,18 +83,6 @@ Nodo* inserirNodo(Nodo* nodo, dadosBancarios* cliente){
     }
 
     return nodo;
-}
-
-Nodo* verificarBalanceamento(Nodo* raiz){
-    if(raiz != NULL){
-        verificarBalanceamento(raiz->esquerda);
-        raiz->fator_balanceamento = calcularAltura(raiz->direita) - calcularAltura(raiz->esquerda);
-        
-        if (raiz->fator_balanceamento > 1 || raiz->fator_balanceamento < -1)
-            raiz = balancearArvore(raiz);
-        verificarBalanceamento(raiz->direita);    
-    }
-    return raiz;
 }
 
 Nodo* removerNodo(Nodo** nodo, int valor_exluido){
@@ -230,7 +226,6 @@ Nodo* rotacaoParaEsquerda(Nodo* nodo) {
     return nodo_direita;
 }
 
-
 Nodo* balancearArvore(Nodo *nodo) {
     // Desbalanceada para a esquerda
     if (nodo->fator_balanceamento < -1) {
@@ -252,33 +247,9 @@ Nodo* balancearArvore(Nodo *nodo) {
     return nodo;
 }
 
-void exibirTotalNiveis(Nodo* nodo) {
-    int i;
-	for (i = 0; i <= calcularAltura(nodo); ++i) {
-        printf("Nivel %d\n", i);
-        exibirNiveis(nodo, i, 0);
-        printf("\n\n");
-    }
-}
 
-// Exibindo nível específico
-void exibirNiveis(Nodo* aux, int atual, int cont) {
-    // Verificando se raiz global não é nula
-    if (!raiz) {
-        printf("A arvore esta vazia!");
-        getchar();
-        return;
-    }
 
-    if (aux) {
-        exibirNiveis(aux->esquerda, atual, cont+1);
 
-        if (atual == cont)
-            printf("%d ", aux->cliente->id);
-
-        exibirNiveis(aux->direita, atual, cont+1);
-    }
-}
 
 
 
@@ -319,13 +290,29 @@ int calcularHashPosDivisao(int valor, int total){
 
 Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida){
     FILE* ponteiro_arquivo;
-    ponteiro_arquivo = fopen("DadosBancoPulini2.txt", "r");
+    ponteiro_arquivo = fopen("DadosBancoPulini.txt", "r");
     char conteudo[100];
     while(fgets(conteudo, BUFSIZ, ponteiro_arquivo) != NULL){
         dadosBancarios* novo = iniciarlista();
         preencherDados(conteudo, novo);
         Nodo* novo_nodo = criarNodo(novo);
-        //arvore_invertida = inserirHash(arvore_invertida, novo_nodo, calcularHashPos(arvore_invertida, novo->id, 0));
+        arvore_invertida = inserirHash(arvore_invertida, novo_nodo, calcularHashPos(arvore_invertida, novo->id, 0));
     }
     return arvore_invertida;
 }
+
+Hashing* inserirHash(Hashing* hash, dadosBancarios* dados, int pos){
+    hash->vetor[pos] = inserirNodo(hash->vetor[pos], dados);
+    return hash;
+}
+
+Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos){
+    if (hash->vetor[pos] == NULL)
+        return NULL;
+    else{
+        Nodo* aux = buscarValor(hash->vetor[pos], pesquisado);
+        return aux;
+    }
+    return NULL;
+}
+
