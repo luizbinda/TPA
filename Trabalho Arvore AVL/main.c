@@ -14,7 +14,8 @@ int getNum(){
 
 int main(){
    	raiz = NULL;
-
+	hash = iniciarHash();
+	hash = iniciarVetorHash(hash, TAMVET);
 	int op = -1;
 	int valor;
     while (op != 0){
@@ -32,17 +33,17 @@ int main(){
 			case 1:{
 				system("cls");
 				dadosBancarios* novo = iniciarlista();
-				system("cls");
 				novo->id = getNum();
 				raiz = inserirNodo(raiz, novo);
-				//raiz = percorrerArvoreBalanceando(raiz);
+				raiz = percorrerArvoreBalanceando(raiz);
 				system("pause");
 				system("cls");
 				break;
 			}
 			case 2:{
 				system("cls");
-				removerNodo(&raiz, getNum());
+				raiz = removerNodo(&raiz, getNum());
+				raiz = percorrerArvoreBalanceando(raiz);
 				system("pause");
 				system("cls");
 				break;			
@@ -69,6 +70,9 @@ int main(){
 			}
 			case 5:{
 				system("cls");
+				dadosBancarios* novo = iniciarlista();
+				novo->id = getNum();
+				inserirHash(hash, novo, calcularHashPos(hash, novo->id, TAMVET));
 				system("pause");
 				system("cls");
 				break;			

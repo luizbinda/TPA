@@ -1,4 +1,4 @@
-#define TAMVET 500
+#define TAMVET 5000
 
 typedef struct Nodo {
     dadosBancarios* cliente;
@@ -144,9 +144,6 @@ Nodo* carregarArquivos(Nodo* raiz){
         preencherDados(conteudo, novo);   
         raiz = inserirNodo(raiz, novo);
         raiz = percorrerArvoreBalanceando(raiz);
-        percorrerArvoreEmOrdemCrescente(raiz);
-        printf("altura: %d\n", calcularAltura(raiz)); 
-        system("pause");
     }
     
     return raiz;
@@ -268,7 +265,6 @@ Nodo* percorrerArvoreBalanceando(Nodo* nodo){
     }
     return nodo;
 }
-
  
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -300,10 +296,6 @@ int calcularHashPos(Hashing* raiz, int valor, int total){
             total = calcularHashPos(raiz, valor, (2 + total * 2));
     }
     return total;
-}
-
-int calcularHashPosDivisao(int valor, int total){
-    return valor % total;
 }
 
 Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida){
