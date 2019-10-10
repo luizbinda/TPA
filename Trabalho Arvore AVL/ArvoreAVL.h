@@ -20,7 +20,6 @@ Nodo* criarNodo(dadosBancarios* cliente);
 Nodo* inserirNodo(Nodo* nodo, dadosBancarios* cliente);
 Nodo* removerNodo(Nodo** nodo, int valor_exluido);
 void percorrerArvoreEmOrdemCrescente(Nodo* nodo);
-void percorrerArvoreEmOrdemDecrescente(Nodo* nodo);
 Nodo* buscarValor(Nodo* nodo, int valor_procurado);
 Nodo* carregarArquivos(Nodo* nodo);
 int calcularAltura(Nodo* nodo);
@@ -37,8 +36,13 @@ int calcularHashPos(Hashing* raiz, int valor, int total);
 Hashing* inserirHash(Hashing* hash, dadosBancarios* dados, int pos);
 Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos);
 Hashing* excluirHash(Hashing* hash, int pos);
-void listarHashFechada(Hashing* hash, int tamanho_hash);
 Hashing* carregarArvoreInvertida(Hashing* arvore_invertida);
+void listarHash(Hashing* hash);
+int calcularAlturaHash(Hashing* nodo, int pos); 
+Nodo* rotacaoParaDireitaHash(Hashing* nodo, int pos);
+Nodo* rotacaoParaEsquerdaHash(Hashing* nodo, int pos);
+Nodo* balancearHash(Hashing *nodo, int pos);
+Hashing* percorrerHashBalanceando(Hashing* nodo, int pos);
 
 Nodo* criarNodo(dadosBancarios* cliente){
     Nodo* novo = (Nodo*)malloc(sizeof(Nodo));
@@ -178,23 +182,6 @@ Nodo* rotacaoParaDireita(Nodo* nodo) {
     nodo->esquerda = nodo_esquerda->direita;
     nodo_esquerda->direita = nodo;
 
-    // Acertando os pais
-    if (nodo->esquerda)
-        nodo->esquerda->pai = nodo;
-
-    nodo_esquerda->pai = nodo->pai;
-    nodo->pai = nodo_esquerda;
-
-    // Caso o aux for a raiz global, atualiza-se o valor da raiz global
-    if (nodo == raiz)
-        raiz = nodo_esquerda;
-
-     // Ligando os ponteiros do pai da nova raiz da sub-arvore corretamente
-    if (nodo_esquerda->pai)
-        if (nodo_esquerda->cliente->id < nodo_esquerda->pai->cliente->id)
-            nodo_esquerda->pai->esquerda = nodo_esquerda;
-        else
-            nodo_esquerda->pai->direita = nodo_esquerda;
 
     // Atualizando os fatores de balanceamento
     nodo_esquerda->fator_balanceamento = calcularAltura(nodo_esquerda->direita) - calcularAltura(nodo_esquerda->esquerda);
@@ -208,23 +195,6 @@ Nodo* rotacaoParaEsquerda(Nodo* nodo) {
     Nodo* nodo_direita = nodo->direita;
     nodo->direita = nodo_direita->esquerda;
     nodo_direita->esquerda = nodo;
-
- // Acertando os pais
-    if (nodo->direita)
-        nodo->direita->pai = nodo;
-    nodo_direita->pai = nodo->pai;
-    nodo->pai = nodo_direita;
-
-    // Caso o aux for a raiz global, atualiza-se o valor da raiz global
-    if (nodo == raiz)
-        raiz = nodo_direita;
-
-    // Ligando os ponteiros do pai da nova raiz da sub-arvore corretamente
-    if (nodo_direita->pai)
-        if (nodo_direita->cliente->id < nodo_direita->pai->cliente->id)
-            nodo_direita->pai->esquerda = nodo_direita;
-        else
-            nodo_direita->pai->direita = nodo_direita;
 
     // Atualizando os fatores de balanceamento
     nodo_direita->fator_balanceamento = calcularAltura(nodo_direita->direita) - calcularAltura(nodo_direita->esquerda);
@@ -309,7 +279,9 @@ Hashing* carregarArvoreInvertida(Hashing* arvore_invertida){
     while(fgets(conteudo, BUFSIZ, ponteiro_arquivo) != NULL){
         dadosBancarios* novo = iniciarlista();
         preencherDados(conteudo, novo);
-        arvore_invertida = inserirHash(arvore_invertida, novo, calcularHashPos(arvore_invertida, novo->id, 0));
+        int pos = calcularHashPos(arvore_invertida, novo->id, 0);
+        arvore_invertida = inserirHash(arvore_invertida, novo, pos);
+        arvore_invertida = percorrerHashBalanceando(arvore_invertida, pos);
     }
     return arvore_invertida;
 }
@@ -319,6 +291,7 @@ Hashing* excluirHash(Hashing* hash, int pos){
     hash->vetor[pos] = NULL;    
     return hash;
 }
+
 Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos){
     if (hash->vetor[pos] == NULL)
         return NULL;
@@ -337,5 +310,77 @@ void listarHash(Hashing* hash){
         printf("ID: %d\n", hash->vetor[i]->cliente->id);
     }
     
+}
+
+int calcularAlturaHash(Hashing* nodo, int pos) {
+	int esq, dir;
+	if( nodo->vetor[pos] != NULL){
+		esq = calcularAlturaHash(nodo, (2 + pos * 2));
+		dir = calcularAlturaHash(nodo, (1 + pos * 2));
+		if(esq > dir)
+			return esq + 1;
+		else
+			return dir +1;
+	}
+	return 0;
+}
+
+Nodo* rotacaoParaDireitaHash(Hashing* nodo, int pos) {
+    // Fazendo a movimentação necessária
+    int pos_esquerda = (2 + pos * 2);
+    nodo->vetor[pos_esquerda] = nodo->vetor[(1 + pos_esquerda * 2)];
+    nodo->vetor[(1 + pos_esquerda * 2)] = nodo->vetor[pos];
+
+    // Atualizando os fatores de balanceamento
+    nodo->vetor[pos_esquerda]->fator_balanceamento = calcularAlturaHash(nodo, ( 1 + pos_esquerda * 2)) - calcularAlturaHash(nodo, ( 2 + pos_esquerda * 2));
+    nodo->vetor[pos]->fator_balanceamento = calcularAlturaHash(nodo, ( 1 + pos * 2)) - calcularAlturaHash(nodo, ( 2 + pos * 2));
+
+    return nodo->vetor[pos_esquerda];
+}
+
+Nodo* rotacaoParaEsquerdaHash(Hashing* nodo, int pos) {
+    // Fazendo a movimentação necessária
+    Nodo* nodo_direita = nodo->vetor[(1 + pos * 2)];
+    int pos_direita = (1 + pos * 2);
+    nodo->vetor[(1 + pos * 2)] = nodo->vetor[(2 + pos_direita * 2)];
+    nodo->vetor[(2 + pos_direita * 2)] = nodo->vetor[pos];
+
+       // Atualizando os fatores de balanceamento
+    nodo->vetor[pos_direita]->fator_balanceamento = calcularAlturaHash(nodo, ( 1 + pos_direita * 2)) - calcularAlturaHash(nodo, ( 2 + pos_direita * 2));
+    nodo->vetor[pos]->fator_balanceamento = calcularAlturaHash(nodo, ( 1 + pos * 2)) - calcularAlturaHash(nodo, ( 2 + pos * 2));
+
+    return nodo->vetor[pos_direita];
+} 
+
+Nodo* balancearHash(Hashing *nodo, int pos) {
+    // Desbalanceada para a esquerda
+    if (nodo->vetor[pos]->fator_balanceamento < -1) {
+        // Caso o nó à esquerda tenha somente filho à direita
+        if(nodo->vetor[(2 + pos * 2)]->fator_balanceamento > 0)
+            nodo->vetor[(2 + pos * 2)] = rotacaoParaEsquerdaHash(nodo, (2 + pos * 2));
+
+        return rotacaoParaDireitaHash(nodo, pos);
+    }
+    // Desbalanceada para a direta
+    else if (nodo->vetor[pos]->fator_balanceamento > 1) {
+        // Caso o nó à direita tenha somente filho à esquerda
+        if (nodo->vetor[(1 + pos * 2)]->fator_balanceamento < 0)
+            nodo->vetor[(1 + pos * 2)] = rotacaoParaDireitaHash(nodo, (1 + pos * 2));
+
+        return rotacaoParaEsquerdaHash(nodo, pos);
+    }
+
+    return nodo->vetor[pos];
+}
+
+Hashing* percorrerHashBalanceando(Hashing* nodo, int pos){
+    if(nodo->vetor[pos] != NULL){
+        percorrerHashBalanceando(nodo, (2 + pos * 2));
+        percorrerHashBalanceando(nodo, (1 + pos * 2)); 
+        nodo->vetor[pos]->fator_balanceamento = calcularAlturaHash(nodo, (1 + pos * 2)) - calcularAlturaHash(nodo, (2 + pos * 2));
+        if (nodo->vetor[pos]->fator_balanceamento > 1 || nodo->vetor[pos]->fator_balanceamento < -1)
+        nodo->vetor[pos] = balancearHash(nodo, pos);    
+    }
+    return nodo;
 }
 

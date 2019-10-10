@@ -72,14 +72,18 @@ int main(){
 				system("cls");
 				dadosBancarios* novo = iniciarlista();
 				novo->id = getNum();
+				int pos = calcularHashPos(hash, novo->id, 0);
 				hash = inserirHash(hash, novo, calcularHashPos(hash, novo->id, 0));
+				hash = percorrerHashBalanceando(hash, pos);
 				system("pause");
 				system("cls");
 				break;			
 			}
 			case 6:{
 				system("cls");				
-				hash = excluirHash(hash, calcularHashPos(hash, getNum(),0));
+				int pos = calcularHashPos(hash, getNum(),0);
+				hash = excluirHash(hash, pos);
+				hash = percorrerHashBalanceando(hash, pos);
 				system("pause");
 				system("cls");
 				break;
@@ -88,7 +92,7 @@ int main(){
 				system("cls");
 				int x = getNum();
 		
-				Nodo* aux = pesquisarHash(hash, x, calcularHashPos(hash, x,0));
+				Nodo* aux = pesquisarHash(hash, x, calcularHashPos(hash, x, 0));
 				// Verificando se enconrou o numero pesquisado
 				if(aux != NULL)
 					printf("Id: %d  Saldo: %f  Nome: %s\n", aux->cliente->id, aux->cliente->saldo, aux->cliente->nome);
@@ -100,15 +104,15 @@ int main(){
 			}
 			case 8:{
 				system("cls");
-				hash = carregarArvoreInvertida(hash );
+				hash = carregarArvoreInvertida(hash);
 				system("pause");
 				system("cls");
 				break;
 			}
 			case 9:{
 				system("cls");
+				percorrerArvoreEmOrdemCrescente(raiz);
 				listarHash(hash);
-				
 				system("pause");
 				system("cls");
 				break;
