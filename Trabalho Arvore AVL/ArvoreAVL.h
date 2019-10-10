@@ -34,12 +34,11 @@ Nodo* percorrerArvoreBalanceando(Nodo* nodo);
 Hashing* iniciarHash();
 Hashing* iniciarVetorHash(Hashing* hash, int tamanho_hash);
 int calcularHashPos(Hashing* raiz, int valor, int total);
-int calcularHashPosDivisao(int valor, int total);
 Hashing* inserirHash(Hashing* hash, dadosBancarios* dados, int pos);
 Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos);
-Hashing* excluirHash(Hashing* hash, int id_exluido);
+Hashing* excluirHash(Hashing* hash, int pos);
 void listarHashFechada(Hashing* hash, int tamanho_hash);
-Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida);
+Hashing* carregarArvoreInvertida(Hashing* arvore_invertida);
 
 Nodo* criarNodo(dadosBancarios* cliente){
     Nodo* novo = (Nodo*)malloc(sizeof(Nodo));
@@ -284,31 +283,18 @@ Hashing* iniciarVetorHash(Hashing* hash, int tamanho_hash){
     return hash;
 }
 
-int calcularHashPos(Hashing* raiz, int valor, int total){
+int calcularHashPos(Hashing* raiz, int valor, int pos){
 
-    if (raiz->vetor[total] == NULL )
-        return total;
+    if (raiz->vetor[pos] == NULL )
+        return pos;
     else {
-        if (raiz->vetor[total]->cliente->id < valor )
-            total = calcularHashPos(raiz, valor, (1 + total * 2));
+        if (raiz->vetor[pos]->cliente->id < valor )
+            pos = calcularHashPos(raiz, valor, (2 + pos * 2));
 
-        else if (raiz->vetor[total]->cliente->id > valor )
-            total = calcularHashPos(raiz, valor, (2 + total * 2));
+        else if (raiz->vetor[pos]->cliente->id > valor )
+            pos = calcularHashPos(raiz, valor, (1 + pos * 2));
     }
-    return total;
-}
-
-Hashing* carregarArvoreInvertida(Nodo* raiz, Hashing* arvore_invertida){
-    FILE* ponteiro_arquivo;
-    ponteiro_arquivo = fopen("DadosBancoPulini.txt", "r");
-    char conteudo[100];
-    while(fgets(conteudo, BUFSIZ, ponteiro_arquivo) != NULL){
-        dadosBancarios* novo = iniciarlista();
-        preencherDados(conteudo, novo);
-        Nodo* novo_nodo = criarNodo(novo);
-        //arvore_invertida = inserirHash(arvore_invertida, novo_nodo, calcularHashPos(arvore_invertida, novo->id, 0));
-    }
-    return arvore_invertida;
+    return pos;
 }
 
 Hashing* inserirHash(Hashing* hash, dadosBancarios* dados, int pos){
@@ -316,6 +302,23 @@ Hashing* inserirHash(Hashing* hash, dadosBancarios* dados, int pos){
     return hash;
 }
 
+Hashing* carregarArvoreInvertida(Hashing* arvore_invertida){
+    FILE* ponteiro_arquivo;
+    ponteiro_arquivo = fopen("DadosBancoPulini.txt", "r");
+    char conteudo[100];
+    while(fgets(conteudo, BUFSIZ, ponteiro_arquivo) != NULL){
+        dadosBancarios* novo = iniciarlista();
+        preencherDados(conteudo, novo);
+        arvore_invertida = inserirHash(arvore_invertida, novo, calcularHashPos(arvore_invertida, novo->id, 0));
+    }
+    return arvore_invertida;
+}
+
+Hashing* excluirHash(Hashing* hash, int pos){
+    free(hash->vetor[pos]);    
+    hash->vetor[pos] = NULL;    
+    return hash;
+}
 Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos){
     if (hash->vetor[pos] == NULL)
         return NULL;
@@ -324,5 +327,15 @@ Nodo* pesquisarHash(Hashing* hash, int pesquisado, int pos){
         return aux;
     }
     return NULL;
+}
+
+void listarHash(Hashing* hash){
+    int i;
+    for ( i = 0; i < TAMVET; i++)
+    {
+        if(hash->vetor[i] != NULL)
+        printf("ID: %d\n", hash->vetor[i]->cliente->id);
+    }
+    
 }
 
