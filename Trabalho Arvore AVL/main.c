@@ -112,6 +112,7 @@ int main(){
 			case 9:{
 				system("cls");
 				percorrerArvoreEmOrdemCrescente(raiz);
+				printf("%d\n",calcularAltura(raiz));
 				listarHash(hash);
 				system("pause");
 				system("cls");
