@@ -4,6 +4,7 @@
 #include <time.h>
 #include "DadosBancoOriginal.h"
 #include "ArvoreAVL.h"
+#include "VetorArvoreAVL.h"
 
 int getNum(){
 	int num;
@@ -81,9 +82,8 @@ int main(){
 			}
 			case 6:{
 				system("cls");				
-				int pos = calcularHashPos(hash, getNum(),0);
-				hash = excluirHash(hash, pos);
-				hash = percorrerHashBalanceando(hash, pos);
+				hash = excluirHash(hash, calcularHashPos(hash, getNum(), 0));
+				hash = percorrerHashBalanceando(hash, 0);
 				system("pause");
 				system("cls");
 				break;
@@ -112,7 +112,6 @@ int main(){
 			case 9:{
 				system("cls");
 				percorrerArvoreEmOrdemCrescente(raiz);
-				printf("%d\n",calcularAltura(raiz));
 				listarHash(hash);
 				system("pause");
 				system("cls");
