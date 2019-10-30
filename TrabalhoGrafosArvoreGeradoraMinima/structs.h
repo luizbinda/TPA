@@ -24,7 +24,7 @@ grafoBairros *iniciarGrafo(int linhas){
 	//PREENCHE TODAS AS DISTANCIAS COM 0
 	for(i=0; i<linhas; i++){
 		for(j=0; j<linhas; j++){
-			novo_grafo->distancias[i][j] = 0;							//atribui 0 para todas as posi��es da matriz
+			novo_grafo->distancias[i][j] = 0;							//atribui 0 para todas as posições da matriz
 		}
 	}
 	
@@ -40,7 +40,8 @@ void listarGrafo(grafoBairros *grafo){
 	if(grafo != NULL){
 		for(l=0; l<grafo->numero_vertices; l++){
 			for(c=0; c<grafo->numero_vertices; c++){
-				printf("%.2f	",grafo->distancias[l][c]);
+				if( c == 0)
+					printf("%.2f	",grafo->distancias[l][c]);
 			}
 			printf("\n");
 		}
@@ -50,10 +51,8 @@ void listarGrafo(grafoBairros *grafo){
 grafoBairros* lerArquivo(char* path_arquivo){
     printf("\n --- LENDO ARQUIVO ---\n");
 	
-	FILE *arquivo;
-	char linha[200];
-	char *subString;
-	
+	FILE* arquivo;
+	char linha[700];	
 	int l = 0;															//contador linha da matriz
 	
 	arquivo = fopen(path_arquivo, "r");
@@ -61,18 +60,10 @@ grafoBairros* lerArquivo(char* path_arquivo){
 	if(arquivo == NULL){
 		printf("\n !!! ERRO DE LEITURA DE ARQUIVO !!! \n\n");
 	}else{
-		while(!feof(arquivo)){											//enquanto n�o encontrar final do arquivo
-			
-			if((fgets(linha,200,arquivo)) != NULL){						//captura 1 linha do arquivo
-				
-				subString = strtok(linha, ";");							//divide a linha pelo ;
-				 
-				while(subString != NULL){         
-					//printf("Substring: %s\n", subString);
-					subString = strtok(NULL, ";");  
-				}											
-			}
-			l++;														//conta quantas linhas o arquivo possui para montar a matriz de de distancias	
+		fgets(linha, 700, arquivo);
+		while(fgets(linha, 700, arquivo)){
+			l++;														//conta quantas linhas o arquivo possui para montar a matriz de de distancias			
+			printf( "linha: %d\n", l);
 		}
 	}
 	fclose(arquivo);													//fecha o arquivo
@@ -88,38 +79,39 @@ grafoBairros* lerArquivo(char* path_arquivo){
 
 void inserir_aresta(grafoBairros *grafo, int origem, int destino, float distancia){
 	
-	printf("\n Linha: %d", origem);
-	printf("\n Coluna: %d", destino);
-	printf("\n Distancia: %f", distancia);
-	system("pause");
+	//printf("\n Linha: %d", origem);
+	//printf("\n Coluna: %d", destino);
+	//printf("\n Distancia: %f", distancia);
+	//system("pause");
 	
 	if(grafo != NULL && origem <= grafo->numero_vertices && destino <= grafo->numero_vertices && distancia >=0){
 		
-		grafo->distancias[origem][destino] = distancia;
+		grafo->distancias[origem][destino - 1] = distancia;
 	}
 }
 
-grafoBairros* lerArquivoDistancias(grafoBairros *grafo, char *nome_arquivo){											
+grafoBairros* lerArquivoDistancias(grafoBairros *grafo, char *path){											
 	
 	printf("\n --- LENDO ARQUIVO ---\n");
 	
 	FILE *arquivo;
-	char linha[200];
+	char linha[700];
 	char *subString;
 	float distancia;
 	
 	int c = 0;															//contador coluna da matriz
 	int l = 0;															//contador linha da matriz
 	
-	arquivo = fopen(nome_arquivo, "r");
+	arquivo = fopen(path, "r");
 	
 	if(arquivo == NULL){
 		printf("\n !!! ERRO DE LEITURA DE ARQUIVO !!! \n\n");
 		system("pause");
 	}else{
+		fgets(linha, 700, arquivo);
 		while(!feof(arquivo)){
 			
-			if((fgets(linha,200,arquivo)) != NULL){
+			if((fgets(linha,700,arquivo)) != NULL){
 				
 				c = 0;													//zera o contador de colunas para cada linha do arquivo
 				subString = strtok(linha, ";");							//divide a linha pelo ;
@@ -127,7 +119,8 @@ grafoBairros* lerArquivoDistancias(grafoBairros *grafo, char *nome_arquivo){
 				
 				while(subString != NULL, c < grafo->numero_vertices){         
 					
-					inserir_aresta(grafo, l, c, distancia);
+					if(c != 0)
+						inserir_aresta(grafo, l, c, distancia);
 					
 					subString = strtok(NULL, ";");  
 					distancia = atof(subString);
