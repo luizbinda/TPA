@@ -4,20 +4,29 @@
 #include "structs.h"
 #include <locale.h>
 
-int main(){
-	printf("\n****** Verificando a localidade corrente ********\n\n");
-	printf ("Localidade corrente: %s\n", setlocale(LC_ALL,NULL) );
-	printf("Não é possível usar acentuação ou ç corretamente…\n\n");
-	
-	printf("\n****** Alterando para a localidade do sistema ********\n\n");
-	
-	//alterando para o padrão do sistema operacional
-	printf("A localidade corrente agora é %s \n",setlocale(LC_ALL,""));
-	printf("Agora não tem mais problema algum!\n");
-	printf("Já posso usar acentuação e também o caracter ç…\n\n\n");
-	
-	system("pause");
-    grafoBairros* grafo = lerArquivo("MatrizBairros.csv");
-    grafo = lerArquivoDistancias( grafo, "MatrizBairros.csv");
-    listarGrafo(grafo);
+int main()
+{
+	printf("A localidade corrente agora ï¿½ %s \n", setlocale(LC_ALL, ""));
+	grafoBairros *grafo = lerArquivo("MatrizBairros.csv");
+	grafo = lerArquivoDistancias(grafo, "MatrizBairros.csv");
+	listarGrafo(grafo);
+	if (verifica_conexo(grafo) == 1)
+		printf("Conexo\n");
+	else
+		printf("NÃ£o conexo\n");
+
+	if (verifica_completo(grafo) == 1)
+		printf("completo\n");
+	else
+		printf("NÃ£o completo\n");
+
+	if (verifica_regular(grafo) == 1)
+		printf("regular\n");
+	else
+		printf("NÃ£o regular\n");
+
+	if (verifica_hamiltoniano(grafo) == 1)
+		printf("hamiltoniano\n");
+	else
+		printf("NÃ£o hamiltoniano\n");
 }

@@ -1,8 +1,6 @@
 
 typedef struct grafoBairros
 {
-
-	char **bairros;		 //vetor de string com nome das bairros
 	float **distancias;  //matriz de distancias das cidades
 	int numero_vertices; //quantidades de linhas e colunas da matriz
 
@@ -84,8 +82,8 @@ grafoBairros *lerArquivo(char *path_arquivo)
 
 	grafoBairros *novo_grafo = iniciarGrafo(l); //cria a estrutura para montar o grafo
 
-	system("pause");
-	system("cls");
+	//system("pause");
+	//system("cls");
 
 	return novo_grafo; //cria a estrutura para montar o grafo
 }
@@ -155,8 +153,149 @@ grafoBairros *lerArquivoDistancias(grafoBairros *grafo, char *path)
 		fclose(arquivo);
 	}
 
-	system("pause");
-	system("cls");
+	//system("pause");
+	//system("cls");
 
 	return grafo;
+}
+
+int verifica_conexo(grafoBairros *grafo)
+{ //VERIFICA SE TODOS OS VERTICES S�O CONECTADOS
+
+	int linha, coluna;
+	int contador = 0;
+
+	if (grafo != NULL)
+	{ //VERIFICA SE O GRAFO � VALIDO
+
+		for (linha = 0; linha < grafo->numero_vertices; linha++)
+		{ //PERCORRE TODOS OS VERTICES DO GRAFO (MATRIZ)
+			contador = 0;
+			for (coluna = 0; coluna < grafo->numero_vertices; coluna++)
+			{ //PERCORRE TODOS OS VIZINHOS DO VERTICE ATUAL
+				if (grafo->distancias[linha][coluna] != 0)
+				{				//SE O VERTICE POSSUI UMA CONEXÇÃO
+					contador++; //INCREMENTA COTADOR
+				}
+			}
+
+			if (contador == 0)
+			{ //SE O CONTADOR CONTINUAR 0... VERTICE ATUAL N�O POSSUI CONEX�ES
+				return 0;
+			}
+		}
+	}
+
+	return 1; //SE PERCCOREU TODOS OS VERTICE... TODOS POSSUEM CONEX�ES
+}
+
+int verifica_completo(grafoBairros *grafo)
+{ //VERIFICA SE TODOS OS VERTICES S�O ADJACENTES
+
+	int linha, coluna;
+	int contador = 0;
+
+	if (grafo != NULL)
+	{ //VERIFICA SE O GRAFO É VALIDO
+
+		for (linha = 0; linha < grafo->numero_vertices; linha++)
+		{ //PERCORRE TODOS OS VERTICES DO GRAFO (MATRIZ)
+			contador = 0;
+			for (coluna = 0; coluna < grafo->numero_vertices; coluna++)
+			{ //PERCORRE TODOS OS VIZINHOS DO VERTICE ATUAL
+				if (grafo->distancias[linha][coluna] != 0)
+				{				//SE O VERTICE POSSUI UMA CONEX�O
+					contador++; //INCREMENTA COTADOR
+				}
+			}
+
+			if ((grafo->numero_vertices - contador) > 1)
+			{ //SE O RESULTADO FOR MAIOR QUE 1... ALGUM VERTICE NÃO POSSUI CONEXÃO COM TODOS OS OUTROS
+				return 0;
+			}
+		}
+	}
+
+	return 1;
+}
+
+int verifica_regular(grafoBairros *grafo)
+{ //VERTICES COM MESMO NUMERO DE ARESTAS
+
+	int linha, coluna;
+	int contador_1 = 0;
+	int contador_2 = 0;
+
+	if (grafo != NULL)
+	{ //VERIFICA SE O GRAFO E VALIDO
+		//PRIMEIRO VERTICE
+		for (coluna = 0; coluna < grafo->numero_vertices; coluna++)
+		{ //PERCORRE TODOS AS CONEXÕES DO PRIMEIRO VERTICE
+			if (grafo->distancias[0][coluna] != 0)
+			{				  //SE O VERTICE POSSUI UMA CONEXÃO
+				contador_1++; //INCREMENTA COTADOR
+			}
+		}
+
+		//A PARTIR DO SEGUNDO VERTICE
+		for (linha = 1; linha < grafo->numero_vertices; linha++)
+		{ //PERCORRE TODOS OS VERTICES A PARTIR DO SEGUNDO
+			contador_2 = 0;
+			for (coluna = 0; coluna < grafo->numero_vertices; coluna++)
+			{ //PERCORRE TODOS OS VIZINHOS DO VERTICE ATUAL
+				if (grafo->distancias[linha][coluna] != 0)
+				{				  //SE O VERTICE POSSUI UMA CONEXÃO
+					contador_2++; //INCREMENTA COTADOR
+				}
+			}
+
+			if (contador_1 != contador_2)
+			{ //SE O NUMERO DE CONXÕES FOR DIFERENTE... O GRAFO NÃO É REGULAR
+				return 0;
+			}
+		}
+	}
+
+	return 1; //SE O NUMERO DE CONEXÕES DE TODOS OS VERTICES FOREM IGUAIS
+}
+
+int verifica_hamiltoniano(grafoBairros *grafo)
+{ //PASSAR POR TODOS OS VERTICES SEM REPETIR
+
+	int linha, coluna, i;
+	int visitados[grafo->numero_vertices]; //vetor de vertices visitados
+
+	for (i = 0; i < grafo->numero_vertices; i++)
+	{					   //inicialmente todos os vertices ainda nao foram visitados
+		visitados[i] = -1; //marca todos os vertices como nao visitados
+	}
+	visitados[i] = 1; //marca o vertice 0 como inicial
+
+	if (grafo != NULL)
+	{ //VERIFICA SE O GRAFO E VALIDO
+
+		for (linha = 0; linha < grafo->numero_vertices; linha++)
+		{ //PERCORRE TODOS OS VERTICES DO GRAFO (MATRIZ)
+			if (visitados[i] != -1)
+			{
+				for (coluna = 0; coluna < grafo->numero_vertices; coluna++)
+				{ //PERCORRE TODOS OS VIZINHOS DO VERTICE ATUAL
+					if (visitados[coluna] == -1 && grafo->distancias[linha][coluna] > 0)
+					{
+						visitados[coluna] = 1;
+					}
+				}
+			}
+		}
+	}
+
+	for (i = 0; i < grafo->numero_vertices; i++)
+	{
+		if (visitados[i] == -1)
+		{
+			return 0;
+		}
+	}
+
+	return 1;
 }
