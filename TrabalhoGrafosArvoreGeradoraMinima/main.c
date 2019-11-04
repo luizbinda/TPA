@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "structs.h"
 #include <locale.h>
+#include "listaAdjacencia.h"
 
 int main()
 {
@@ -10,23 +10,9 @@ int main()
 	grafoBairros *grafo = lerArquivo("MatrizBairros.csv");
 	grafo = lerArquivoDistancias(grafo, "MatrizBairros.csv");
 	listarGrafo(grafo);
-	if (verifica_conexo(grafo) == 1)
-		printf("Conexo\n");
-	else
-		printf("Não conexo\n");
-
-	if (verifica_completo(grafo) == 1)
-		printf("completo\n");
-	else
-		printf("Não completo\n");
-
-	if (verifica_regular(grafo) == 1)
-		printf("regular\n");
-	else
-		printf("Não regular\n");
-
-	if (verifica_hamiltoniano(grafo) == 1)
-		printf("hamiltoniano\n");
-	else
-		printf("Não hamiltoniano\n");
+	listaAdjacencia *lista = iniciarListaAdjacencia(grafo->numero_vertices);
+	lista = copiarMatriz(grafo, lista);
+	listarLista(lista, grafo->numero_vertices);
+	//listaAdjacencia *kruscal = algoritimo_kruscal(lista, grafo->numero_vertices);
+	//listarLista(kruscal, grafo->numero_vertices);
 }

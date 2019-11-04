@@ -47,7 +47,7 @@ void listarGrafo(grafoBairros *grafo)
 		{
 			for (c = 0; c < grafo->numero_vertices; c++)
 			{
-				if (c == 0 || c == 46)
+				if (c == 0)
 					printf("%.2f	", grafo->distancias[l][c]);
 			}
 			printf("\n");
@@ -75,7 +75,7 @@ grafoBairros *lerArquivo(char *path_arquivo)
 		while (fgets(linha, 700, arquivo))
 		{
 			l++; //conta quantas linhas o arquivo possui para montar a matriz de de distancias
-			printf("linha: %d\n", l);
+				 //printf("linha: %d\n", l);
 		}
 	}
 	fclose(arquivo); //fecha o arquivo
@@ -91,23 +91,20 @@ grafoBairros *lerArquivo(char *path_arquivo)
 void inserir_aresta(grafoBairros *grafo, int origem, int destino, float distancia)
 {
 
-	//printf("\n Linha: %d", origem);
-	//printf("\n Coluna: %d", destino);
-	//printf("\n Distancia: %f", distancia);
+	printf("\n Linha: %d", origem);
+	printf("\n Coluna: %d", destino);
+	printf("\n Distancia: %f", distancia);
 	//system("pause");
 
 	if (grafo != NULL && origem <= grafo->numero_vertices && destino <= grafo->numero_vertices && distancia >= 0)
 	{
-
 		grafo->distancias[origem][destino - 1] = distancia;
 	}
 }
 
 grafoBairros *lerArquivoDistancias(grafoBairros *grafo, char *path)
 {
-
-	printf("\n --- LENDO ARQUIVO ---\n");
-
+	printf("\n aki \n\n");
 	FILE *arquivo;
 	char linha[700];
 	char *subString;
@@ -115,7 +112,6 @@ grafoBairros *lerArquivoDistancias(grafoBairros *grafo, char *path)
 
 	int c = 0; //contador coluna da matriz
 	int l = 0; //contador linha da matriz
-
 	arquivo = fopen(path, "r");
 
 	if (arquivo == NULL)
@@ -125,6 +121,7 @@ grafoBairros *lerArquivoDistancias(grafoBairros *grafo, char *path)
 	}
 	else
 	{
+
 		fgets(linha, 700, arquivo);
 		while (!feof(arquivo))
 		{
