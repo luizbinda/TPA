@@ -104,7 +104,6 @@ void inserir_aresta(grafoBairros *grafo, int origem, int destino, float distanci
 
 grafoBairros *lerArquivoDistancias(grafoBairros *grafo, char *path)
 {
-	printf("\n aki \n\n");
 	FILE *arquivo;
 	char linha[700];
 	char *subString;
@@ -131,7 +130,7 @@ grafoBairros *lerArquivoDistancias(grafoBairros *grafo, char *path)
 
 				c = 0;							//zera o contador de colunas para cada linha do arquivo
 				subString = strtok(linha, ";"); //divide a linha pelo ;
-				distancia = atof(subString);
+				//distancia = atof(subString);
 
 				while (subString != NULL, c < grafo->numero_vertices + 1)
 				{
