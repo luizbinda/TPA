@@ -3,34 +3,46 @@
 #include <string.h>
 #include "dijkstra.h"
 
-char *iniciarString(char *conteudo)
+char *inserirString(int size)
 {
-    char *string = (char *)malloc(sizeof(conteudo));
-    strcpy(string, conteudo);
+    char *string = (char *)malloc(size);
+    fflush(stdin);
+    fgets(string, size * 2, stdin);
+    string[strlen(string) - 1] = '\0';
     return string;
+}
+
+char **getCaminho(int total_vertices, int max_tamanho_do_caminho)
+{
+    char **caminho = (char **)malloc(sizeof(char *) * max_tamanho_do_caminho * total_vertices);
+    printf("Insira os nos.\n");
+
+    int i;
+    for (i = 0; i < total_vertices; ++i)
+    {
+        printf("No %d: ", i + 1);
+        fflush(stdin);
+        caminho[i] = inserirString(max_tamanho_do_caminho);
+    }
+    return caminho;
 }
 
 int main()
 {
-    char string[100];
-    printf("Digite o primeiro no: ");
-    scanf("%s", string);
-    char *primeiro_no = iniciarString(string);
-    printf("Digite o segundo no: ");
-    scanf("%s", string);
-    char *segundo_no = iniciarString(string);
-    printf("Digite o terceiro no: ");
-    scanf("%s", string);
-    char *terceiro_no = iniciarString(string);
-    printf("Digite o quarto no: ");
-    scanf("%s", string);
-    char *quarto_no = iniciarString(string);
-
     Grafo *grafo = verifica_tamanho_arquivo("ProblemaSlideCaminhoMínimo.csv");
     grafo = ler_arquivo_distancias(grafo, "ProblemaSlideCaminhoMínimo.csv");
-    imprime_grafo(grafo);
 
-    printf("distancia nodo1 para nodo2: %d", algoritimo_dijskistra(grafo, 1, 2));
+    int i, tamanhoDoCaminho = 4, distanciaTotal = 0;
+
+    char **caminho = getCaminho(tamanhoDoCaminho, 100);
+
+    for (i = 0; i < tamanhoDoCaminho - 1; ++i)
+        realizarDijkstra(
+            grafo,
+            caminho[i],
+            caminho[i + 1],
+            &distanciaTotal);
+    printf("Distancia Total: %d\n", distanciaTotal);
 
     return 0;
 }
