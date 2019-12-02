@@ -1,8 +1,3 @@
-/*
-#include "DadosBancoOriginal.h"
-#include "ArvoreAVL.h"
-*/
-
 typedef struct Hashing {
     Nodo** vetor;
 }Hashing;
